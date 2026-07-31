@@ -1,6 +1,6 @@
 export function Contact() {
   return (
-    <section id="contato" className="px-6 md:px-16 py-24 bg-black">
+    <section id="contato" className="px-6 md:px-16 py-24 bg-black min-h-screen">
       <p className="text-purple-400 font-mono text-sm mb-4">03 / CONTATO</p>
       <h2 className="text-5xl md:text-6xl font-serif text-white mb-4">
         Vamos Conversar<span className="text-purple-400">.</span>

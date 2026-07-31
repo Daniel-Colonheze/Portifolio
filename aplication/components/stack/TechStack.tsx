@@ -3,20 +3,21 @@
 import { stack } from "@/data/stack";
 
 export function TechStack() {
-  const doubled = [...stack, ...stack]; // duplica pra loop infinito sem "costura" visível
-
   return (
-    <section className="relative py-16 bg-black border-y border-purple-900/30 overflow-hidden">
-      <div className="flex whitespace-nowrap animate-marquee">
-        {doubled.map((tech, i) => (
-          <span
-            key={i}
-            className="text-2xl md:text-4xl font-serif text-gray-600 mx-8 flex items-center"
-          >
-            {tech.name}
-            <span className="text-purple-400 ml-8">•</span>
-          </span>
-        ))}
+    <section className="py-12 bg-black/80 border-y border-purple-900/20 overflow-hidden">
+      <div className="container mx-auto px-4">
+        <div className="relative overflow-hidden">
+          <div className="animate-marquee flex gap-8 whitespace-nowrap">
+            {[...stack, ...stack].map((tech, index) => (
+              <span
+                key={index}
+                className="text-gray-300 text-sm font-mono tracking-wider"
+              >
+                {tech.name}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

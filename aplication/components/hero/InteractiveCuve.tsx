@@ -1,9 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, extend } from "@react-three/fiber";
 import { MeshDistortMaterial, Icosahedron } from "@react-three/drei";
 import * as THREE from "three";
+
+extend(THREE);
 
 function Shape() {
   const meshRef = useRef<THREE.Mesh>(null);
