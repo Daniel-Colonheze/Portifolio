@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useGLTF, Html } from "@react-three/drei";
+import { useGLTF, Html, Line } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRouter } from "next/navigation";
 import * as THREE from "three";
@@ -9,8 +9,14 @@ import * as THREE from "three";
 const TARGET_HEIGHT = 2.2;
 
 export function Computer({ debug = false }: { debug?: boolean }) {
+  const cableAnchorRef = useRef(new THREE.Vector3(0.3, 0.05, -0.4));
+  const [cablePoints, setCablePoints] = useState<[number, number, number][]>([
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0],
+  ]);
   const router = useRouter();
-  const { scene, nodes } = useGLTF("/models/desktop.glb");
+  const { scene } = useGLTF("/models/desktop.glb");
   const model = useMemo(() => scene.clone(true), [scene]);
 
   const groupRef = useRef<THREE.Group>(null);
@@ -19,8 +25,8 @@ export function Computer({ debug = false }: { debug?: boolean }) {
   const keyNodesRef = useRef<THREE.Object3D[]>([]);
   const activeKeys = useRef<Map<THREE.Object3D, number>>(new Map());
   const visibleRef = useRef(true);
+  const modelScaleRef = useRef(1);
 
-  // NOVO: âncora da tela como estado, pra reagir quando for encontrada
   const [screenAnchor, setScreenAnchor] = useState<THREE.Object3D | null>(null);
 
   const [screenState, setScreenState] = useState<"boot" | "terminal">("boot");
@@ -39,6 +45,7 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     "TUDO PRONTO!",
   ];
 
+  // Normaliza o tamanho do modelo pra caber num TARGET_HEIGHT fixo
   useLayoutEffect(() => {
     const inner = innerRef.current;
     if (!inner) return;
@@ -54,6 +61,7 @@ export function Computer({ debug = false }: { debug?: boolean }) {
 
     const scale = TARGET_HEIGHT / Math.max(size.y, 0.001);
     inner.scale.setScalar(scale);
+    modelScaleRef.current = scale;
 
     inner.position.set(
       -center.x * scale,
@@ -69,6 +77,7 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     }
   }, [model, debug]);
 
+  // Acha mouse, monitor (cria a ancora da tela) e as teclas — tudo dentro de "model" (o clone renderizado)
   useEffect(() => {
     const find = (pred: (o: THREE.Object3D) => boolean) => {
       let found: THREE.Object3D | null = null;
@@ -78,14 +87,10 @@ export function Computer({ debug = false }: { debug?: boolean }) {
       return found;
     };
 
-    mouseNodeRef.current =
-      (nodes["g_Mouse"] as THREE.Object3D) ?? find((o) => /mouse/i.test(o.name));
+    mouseNodeRef.current = find((o) => /mouse/i.test(o.name));
 
-    const monitor =
-      find((o) => /(screen|tela|monitor|display)/i.test(o.name)) ?? null;
+    const monitor = find((o) => /(screen|tela|monitor|display)/i.test(o.name));
 
-    // NOVO: cria a âncora da tela como FILHO do mesh do monitor,
-    // assim ela herda posição/rotação/escala automaticamente.
     if (monitor) {
       monitor.updateWorldMatrix(true, false);
       const box = new THREE.Box3().setFromObject(monitor);
@@ -98,24 +103,40 @@ export function Computer({ debug = false }: { debug?: boolean }) {
       const anchor = new THREE.Object3D();
       anchor.position.copy(localCenter);
 
-      // Empurra a âncora pra face da frente da tela.
-      // Se o HTML aparecer "atrás"/invertido, troca o sinal aqui (+ para -).
       const frontOffset = Math.min(size.x, size.y, size.z) / 2;
-      anchor.position.x += frontOffset;
+      anchor.position.y += frontOffset * 20; // ligeiramente acima do centro
+        anchor.position.x -= frontOffset * 20;
+      anchor.rotation.y = Math.PI / -2;
+
+      // Contrabalancea a escala herdada do grupo pai, pra tela não ficar minúscula
+      const compensScale = 1 / modelScaleRef.current;
+      anchor.scale.setScalar(compensScale);
 
       monitor.add(anchor);
       setScreenAnchor(anchor);
+
+      if (debug) {
+        console.log("[Computer] monitor encontrado:", monitor.name, "size:", size);
+        console.log("[Computer] escala de compensação da âncora:", compensScale);
+      }
+    } else if (debug) {
+      console.log("[Computer] NENHUM monitor encontrado com esse regex");
     }
 
     const keys: THREE.Object3D[] = [];
-    const teclado =
-      (nodes["g_Teclado"] as THREE.Object3D) ?? find((o) => /teclado|keyboard/i.test(o.name));
+    const teclado = find((o) => /teclado|keyboard/i.test(o.name) && o.type === "Group");
     teclado?.traverse((child) => {
       if (child.name.startsWith("pCube") && child.type === "Mesh") keys.push(child);
     });
     keyNodesRef.current = keys;
-  }, [model, nodes]);
 
+    if (debug) {
+      console.log("[Computer] mouse encontrado:", !!mouseNodeRef.current);
+      console.log("[Computer] teclas encontradas:", keys.length);
+    }
+  }, [model, debug]);
+
+  // Só reage a teclado quando a seção do computador está visível na tela
   useEffect(() => {
     const el = document.getElementById("computador");
     if (!el) return;
@@ -127,19 +148,22 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     return () => io.disconnect();
   }, []);
 
-  useEffect(() => {
+  // Mouse real -> mouse 3D
+    useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const node = mouseNodeRef.current;
-      if (!node) return;
-      const x = (e.clientX / window.innerWidth - 0.5) * 4;
-      const z = (e.clientY / window.innerHeight - 0.5) * 4;
-      node.position.x = THREE.MathUtils.lerp(node.position.x, x, 0.1);
-      node.position.z = THREE.MathUtils.lerp(node.position.z, z, 0.1);
+        const node = mouseNodeRef.current;
+        if (!node) return;
+        const x = (e.clientX / window.innerWidth - 0.5) * 4;
+        const z = (e.clientY / window.innerHeight - 0.5) * 4;
+
+        node.position.x = THREE.MathUtils.lerp(node.position.x, -z, 0.1); // trocado: agora com sinal negativo
+        node.position.z = THREE.MathUtils.lerp(node.position.z, x, 0.1);
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    }, []);
 
+  // Teclado real -> afunda tecla 3D + digita no terminal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!visibleRef.current) return;
@@ -174,6 +198,7 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [screenState, currentInput]);
 
+  // Efeito de "digitação" do texto de boot
   useEffect(() => {
     if (screenState !== "boot") return;
     let i = 0;
@@ -200,19 +225,37 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     return () => clearInterval(interval);
   }, [screenState]);
 
+  // Roda a cada frame: anima teclas afundando + recalcula o cabo seguindo o mouse
   useFrame(() => {
-    const now = performance.now();
-    activeKeys.current.forEach((startTime, key) => {
-      const elapsed = now - startTime;
-      const duration = 150;
-      if (elapsed < duration) {
-        key.position.y = -Math.sin((elapsed / duration) * Math.PI) * 0.5;
-      } else {
-        key.position.y = 0;
-        activeKeys.current.delete(key);
-      }
-    });
+  const now = performance.now();
+  activeKeys.current.forEach((startTime, key) => {
+    const elapsed = now - startTime;
+    const duration = 150;
+    if (elapsed < duration) {
+      key.position.y = -Math.sin((elapsed / duration) * Math.PI) * 0.5;
+    } else {
+      key.position.y = 0;
+      activeKeys.current.delete(key);
+    }
   });
+
+  if (mouseNodeRef.current) {
+    const mousePos = mouseNodeRef.current.position;
+    const anchor = cableAnchorRef.current;
+
+    const midPoint: [number, number, number] = [
+      (anchor.x + mousePos.x) / 2,
+      Math.min(anchor.y, 0) - 0.15,
+      (anchor.z + mousePos.z) / 2,
+    ];
+
+    setCablePoints([
+      [anchor.x, anchor.y, anchor.z],
+      midPoint,
+      [mousePos.x, 0, mousePos.z],
+    ]);
+  }
+});
 
   const executeCommand = (cmd: string) => {
     const trimmed = cmd.trim().toLowerCase();
@@ -296,21 +339,23 @@ export function Computer({ debug = false }: { debug?: boolean }) {
       <group ref={innerRef}>
         <primitive object={model} />
 
-        {/* NOVO: Html agora é filho real da âncora presa ao monitor */}
         {screenAnchor && (
           <primitive object={screenAnchor}>
             <Html
               transform
               occlude
-              distanceFactor={1.4}
+              distanceFactor={0.65}
+              zIndexRange={[1, 0]}
               className="pointer-events-auto"
             >
-              <div className="h-[240px] w-[380px] overflow-hidden rounded-sm border border-purple-900/70 bg-black/95 p-3 shadow-[0_0_40px_rgba(168,85,247,0.35)]">
+              <div className="h-[320px] w-[550px] overflow-hidden rounded-sm border border-purple-900/70 bg-black/95 p-3 shadow-[0_0_40px_rgba(168,85,247,0.35)]">
                 {screenContent}
               </div>
             </Html>
           </primitive>
         )}
+
+        <Line points={cablePoints} color="#1a1a1a" lineWidth={2} curveType="catmullrom" />
       </group>
     </group>
   );

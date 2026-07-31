@@ -44,11 +44,12 @@ export function ComputerSection() {
         <OrbitControls
           makeDefault
           enableZoom
-          minDistance={1.8}
+          minDistance={1}
           maxDistance={6.0}
           minPolarAngle={Math.PI / 6}
           maxPolarAngle={Math.PI / 2}
           enablePan={false}
+          target={[0.20, 0.80, 0]}
         />
       </Canvas>
     </section>
