@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { LanguageSwitcher } from "../language/LanguageSwitcher";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 const textVariants = {
   hidden: {
@@ -35,8 +37,14 @@ const itemVariants = {
 };
 
 export function Hero() {
+  const { t } = useLanguage();
+
   return (
     <section className="relative flex min-h-screen items-center overflow-hidden bg-black px-6 md:px-16">
+      <div className="absolute right-6 top-6 z-30 sm:right-10 sm:top-8 md:right-16 md:top-10">
+        <LanguageSwitcher />
+      </div>
+
       <div className="pointer-events-none absolute left-0 top-1/2 h-[500px] w-[500px] -translate-y-1/2 rounded-full bg-purple-700/[0.06] blur-[140px]" />
 
       <motion.div
@@ -53,7 +61,7 @@ export function Hero() {
           variants={itemVariants}
           className="mb-4 font-mono text-sm text-purple-400"
         >
-          // OLÁ, EU SOU
+          {t.hero.greeting}
         </motion.p>
 
         <motion.h1
@@ -68,17 +76,14 @@ export function Hero() {
           variants={itemVariants}
           className="mb-6 text-2xl italic text-gray-400 md:text-3xl"
         >
-          Desenvolvedor Frontend
+          {t.hero.role}
         </motion.p>
 
         <motion.p
           variants={itemVariants}
           className="mb-8 leading-relaxed text-gray-400"
         >
-          Estudante de Engenharia de Software com experiência prática em
-          desenvolvimento web, focado em frontend e integração com APIs.
-          Trabalho com React, Next.js e Node.js construindo interfaces
-          responsivas e sistemas completos, do zero à produção.
+          {t.hero.description}
         </motion.p>
 
         <motion.a
@@ -93,7 +98,7 @@ export function Hero() {
           }}
           className="inline-block border-b border-purple-400/40 font-mono text-sm text-purple-400 transition-colors"
         >
-          ↓ role para explorar
+          {t.hero.explore}
         </motion.a>
       </motion.div>
 
@@ -132,32 +137,6 @@ export function Hero() {
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-purple-500/[0.05]" />
       </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: false }}
-        transition={{
-          duration: 1,
-          delay: 0.8,
-        }}
-        className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 md:block"
-      >
-        <motion.div
-          animate={{
-            y: [0, 7, 0],
-          }}
-          transition={{
-            duration: 1.8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="font-mono text-[10px] uppercase tracking-[0.3em] text-purple-400/50"
-        >
-          Scroll
-        </motion.div>
-      </motion.div>
     </section>
   );
 }
-

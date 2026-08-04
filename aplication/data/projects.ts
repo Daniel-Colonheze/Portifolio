@@ -1,19 +1,19 @@
 export const projects = [
   {
     year: "2025",
-    title: "AETA - Gestao de Transporte Escolar",
+    title: "Simulador de Deadlock",
     description:
-      "Sistema completo de gestao de transporte escolar para a Associacao de Estudantes de Taruma. Interface responsiva com CRUD de usuarios, eventos, documentos e pagamentos.",
-    tags: ["React", "Next.js", "CRUD"],
-    link: "https://aeta.com.br/",
+      "Uma experiência interativa que utiliza um cruzamento de trânsito para demonstrar como processos concorrentes podem entrar em estado de espera circular. O projeto apresenta o problema, permite visualizar o deadlock acontecendo e demonstra estratégias de prevenção utilizando controle de acesso.",
+    tags: ["React", "Next.js", "Tailwind CSS", "TypeScript"],
+    link: "https://simulador-de-deadlock-em-transito.vercel.app/",
   },
   {
-    year: "2025",
-    title: "Turnix",
+    year: "2026",
+    title: "CidadeViva",
     description:
-      "Landing page de um SaaS de gestao de escalas de trabalho, com cena 3D orbital interativa, transicoes de tema claro/escuro e scroll suave.",
-    tags: ["Next.js", "React Three Fiber", "Framer Motion"],
-    link: "https://turnix.com.br/",
+      "Sistema (em desenvolvimento) de mapeamento colaborativo de problemas urbanos. O cidadão reporta com foto e localização precisa; o gestor visualiza tudo em um dashboard com filtros por categoria, status e período. Arquitetura separada em frontend (Next.js), API REST (NestJS) e banco geoespacial (PostgreSQL + PostGIS), com deploy na nuvem e armazenamento de imagens via R2.",
+    tags: ["Next.js", "NestJS", "PostgreSQL", "PostGIS", "Leaflet", "Prisma"],
+    link: "",
   },
   {
     year: "2025",
