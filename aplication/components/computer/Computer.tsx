@@ -8,9 +8,9 @@ import * as THREE from "three";
 
 const TARGET_HEIGHT = 2.2;
 
-export function Computer({ debug = false }: { debug?: boolean }) {
+export function Computer({ debug = false }) {
   const cableAnchorRef = useRef(new THREE.Vector3(0.3, 0.05, -0.4));
-  const [cablePoints, setCablePoints] = useState<[number, number, number][]>([
+  const [cablePoints, setCablePoints] = useState([
     [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0],
@@ -19,33 +19,32 @@ export function Computer({ debug = false }: { debug?: boolean }) {
   const { scene } = useGLTF("/models/desktop.glb");
   const model = useMemo(() => scene.clone(true), [scene]);
 
-  const groupRef = useRef<THREE.Group>(null);
-  const innerRef = useRef<THREE.Group>(null);
-  const mouseNodeRef = useRef<THREE.Object3D | null>(null);
-  const keyNodesRef = useRef<THREE.Object3D[]>([]);
-  const activeKeys = useRef<Map<THREE.Object3D, number>>(new Map());
+  const groupRef = useRef(null);
+  const innerRef = useRef(null);
+  const mouseNodeRef = useRef(null);
+  const keyNodesRef = useRef([]);
+  const activeKeys = useRef(new Map());
   const visibleRef = useRef(true);
   const modelScaleRef = useRef(1);
 
-  const [screenAnchor, setScreenAnchor] = useState<THREE.Object3D | null>(null);
-
-  const [screenState, setScreenState] = useState<"boot" | "terminal">("boot");
-  const [terminalHistory, setTerminalHistory] = useState<string[]>([
+  const [screenAnchor, setScreenAnchor] = useState(null);
+  const [screenState, setScreenState] = useState("boot");
+  const [terminalHistory, setTerminalHistory] = useState([
     "Sistema Operacional v1.0.0 carregado.",
     "Digite 'help' para listar todos os comandos.",
   ]);
   const [currentInput, setCurrentInput] = useState("");
   const [bootText, setBootText] = useState("");
+  const [anchorReady, setAnchorReady] = useState(false);
 
   const bootPhrases = [
-    "INICIALIZANDO SISTEMA...",
-    "CARREGANDO PERFIL DANIEL COLONHEZE...",
-    "CARREGANDO MODULOS DE PROJETOS...",
-    "CONECTANDO COMUNICACAO DE CONTATO...",
-    "TUDO PRONTO!",
+    " INICIALIZANDO SISTEMA...",
+    " CARREGANDO PERFIL DANIEL COLONHEZE...",
+    " CARREGANDO MODULOS DE PROJETOS...",
+    " CONECTANDO COMUNICACAO DE CONTATO...",
+    " TUDO PRONTO!",
   ];
 
-  // Normaliza o tamanho do modelo pra caber num TARGET_HEIGHT fixo
   useLayoutEffect(() => {
     const inner = innerRef.current;
     if (!inner) return;
@@ -70,17 +69,16 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     );
 
     if (debug) {
-      const names: string[] = [];
+      const names = [];
       inner.traverse((c) => c.name && names.push(`${c.type}:${c.name}`));
       console.log("[Computer] nos do GLB:", names);
       console.log("[Computer] size:", size, "scale:", scale);
     }
   }, [model, debug]);
 
-  // Acha mouse, monitor (cria a ancora da tela) e as teclas — tudo dentro de "model" (o clone renderizado)
   useEffect(() => {
-    const find = (pred: (o: THREE.Object3D) => boolean) => {
-      let found: THREE.Object3D | null = null;
+    const find = (pred) => {
+      let found = null;
       model.traverse((o) => {
         if (!found && pred(o)) found = o;
       });
@@ -104,26 +102,51 @@ export function Computer({ debug = false }: { debug?: boolean }) {
       anchor.position.copy(localCenter);
 
       const frontOffset = Math.min(size.x, size.y, size.z) / 2;
-      anchor.position.y += frontOffset * 20; // ligeiramente acima do centro
-        anchor.position.x -= frontOffset * 20;
+      anchor.position.y += frontOffset * -50;
+      anchor.position.x -= frontOffset * 20;
       anchor.rotation.y = Math.PI / -2;
 
-      // Contrabalancea a escala herdada do grupo pai, pra tela não ficar minúscula
       const compensScale = 1 / modelScaleRef.current;
       anchor.scale.setScalar(compensScale);
 
       monitor.add(anchor);
       setScreenAnchor(anchor);
+      setAnchorReady(true);
 
       if (debug) {
         console.log("[Computer] monitor encontrado:", monitor.name, "size:", size);
         console.log("[Computer] escala de compensação da âncora:", compensScale);
       }
-    } else if (debug) {
-      console.log("[Computer] NENHUM monitor encontrado com esse regex");
+    } else {
+      if (debug) console.log("[Computer] NENHUM monitor encontrado com esse regex");
+      const retry = setTimeout(() => {
+        const monitorRetry = find((o) => /(screen|tela|monitor|display)/i.test(o.name));
+        if (monitorRetry) {
+          monitorRetry.updateWorldMatrix(true, false);
+          const box = new THREE.Box3().setFromObject(monitorRetry);
+          const size = new THREE.Vector3();
+          const worldCenter = new THREE.Vector3();
+          box.getSize(size);
+          box.getCenter(worldCenter);
+          const localCenter = monitorRetry.worldToLocal(worldCenter.clone());
+          const anchor = new THREE.Object3D();
+          anchor.position.copy(localCenter);
+          const frontOffset = Math.min(size.x, size.y, size.z) / 2;
+          anchor.position.y += frontOffset * 20;
+          anchor.position.x -= frontOffset * 20;
+          anchor.rotation.y = Math.PI / -2;
+          const compensScale = 1 / modelScaleRef.current;
+          anchor.scale.setScalar(compensScale);
+          monitorRetry.add(anchor);
+          setScreenAnchor(anchor);
+          setAnchorReady(true);
+          if (debug) console.log("[Computer] monitor encontrado na segunda tentativa");
+        }
+      }, 500);
+      return () => clearTimeout(retry);
     }
 
-    const keys: THREE.Object3D[] = [];
+    const keys = [];
     const teclado = find((o) => /teclado|keyboard/i.test(o.name) && o.type === "Group");
     teclado?.traverse((child) => {
       if (child.name.startsWith("pCube") && child.type === "Mesh") keys.push(child);
@@ -136,7 +159,6 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     }
   }, [model, debug]);
 
-  // Só reage a teclado quando a seção do computador está visível na tela
   useEffect(() => {
     const el = document.getElementById("computador");
     if (!el) return;
@@ -148,24 +170,21 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     return () => io.disconnect();
   }, []);
 
-  // Mouse real -> mouse 3D
-    useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-        const node = mouseNodeRef.current;
-        if (!node) return;
-        const x = (e.clientX / window.innerWidth - 0.5) * 4;
-        const z = (e.clientY / window.innerHeight - 0.5) * 4;
-
-        node.position.x = THREE.MathUtils.lerp(node.position.x, -z, 0.1); // trocado: agora com sinal negativo
-        node.position.z = THREE.MathUtils.lerp(node.position.z, x, 0.1);
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const node = mouseNodeRef.current;
+      if (!node) return;
+      const x = (e.clientX / window.innerWidth - 0.5) * 4;
+      const z = (e.clientY / window.innerHeight - 0.5) * 4;
+      node.position.x = THREE.MathUtils.lerp(node.position.x, -z, 0.1);
+      node.position.z = THREE.MathUtils.lerp(node.position.z, x, 0.1);
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, []);
+  }, []);
 
-  // Teclado real -> afunda tecla 3D + digita no terminal
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e) => {
       if (!visibleRef.current) return;
 
       const keys = keyNodesRef.current;
@@ -198,7 +217,6 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [screenState, currentInput]);
 
-  // Efeito de "digitação" do texto de boot
   useEffect(() => {
     if (screenState !== "boot") return;
     let i = 0;
@@ -225,39 +243,38 @@ export function Computer({ debug = false }: { debug?: boolean }) {
     return () => clearInterval(interval);
   }, [screenState]);
 
-  // Roda a cada frame: anima teclas afundando + recalcula o cabo seguindo o mouse
   useFrame(() => {
-  const now = performance.now();
-  activeKeys.current.forEach((startTime, key) => {
-    const elapsed = now - startTime;
-    const duration = 150;
-    if (elapsed < duration) {
-      key.position.y = -Math.sin((elapsed / duration) * Math.PI) * 0.5;
-    } else {
-      key.position.y = 0;
-      activeKeys.current.delete(key);
+    const now = performance.now();
+    activeKeys.current.forEach((startTime, key) => {
+      const elapsed = now - startTime;
+      const duration = 150;
+      if (elapsed < duration) {
+        key.position.y = -Math.sin((elapsed / duration) * Math.PI) * 0.5;
+      } else {
+        key.position.y = 0;
+        activeKeys.current.delete(key);
+      }
+    });
+
+    if (mouseNodeRef.current) {
+      const mousePos = mouseNodeRef.current.position;
+      const anchor = cableAnchorRef.current;
+
+      const midPoint = [
+        (anchor.x + mousePos.x) / 2,
+        Math.min(anchor.y, 0) - 0.15,
+        (anchor.z + mousePos.z) / 2,
+      ];
+
+      setCablePoints([
+        [anchor.x, anchor.y, anchor.z],
+        midPoint,
+        [mousePos.x, 0, mousePos.z],
+      ]);
     }
   });
 
-  if (mouseNodeRef.current) {
-    const mousePos = mouseNodeRef.current.position;
-    const anchor = cableAnchorRef.current;
-
-    const midPoint: [number, number, number] = [
-      (anchor.x + mousePos.x) / 2,
-      Math.min(anchor.y, 0) - 0.15,
-      (anchor.z + mousePos.z) / 2,
-    ];
-
-    setCablePoints([
-      [anchor.x, anchor.y, anchor.z],
-      midPoint,
-      [mousePos.x, 0, mousePos.z],
-    ]);
-  }
-});
-
-  const executeCommand = (cmd: string) => {
+  const executeCommand = (cmd) => {
     const trimmed = cmd.trim().toLowerCase();
 
     if (trimmed === "projects" || trimmed === "projetos") return router.push("/projetos");
@@ -339,11 +356,11 @@ export function Computer({ debug = false }: { debug?: boolean }) {
       <group ref={innerRef}>
         <primitive object={model} />
 
-        {screenAnchor && (
+        {anchorReady && screenAnchor && (
           <primitive object={screenAnchor}>
             <Html
               transform
-              occlude
+              occlude={false}
               distanceFactor={0.65}
               zIndexRange={[1, 0]}
               className="pointer-events-auto"
