@@ -163,7 +163,7 @@ export function Contact() {
           transition={{ delay: 0.5, duration: 0.7 }}
           className="mt-16 font-mono text-[11px] uppercase tracking-[0.3em] text-white/70"
         >
-          {t.contact.availability}
+          {t.contact.availableForWork}
         </motion.p>
       </motion.div>
     </section>
