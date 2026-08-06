@@ -67,10 +67,24 @@ export function Header() {
   };
 
   return (
-    <header className="absolute left-0 right-0 top-0 z-50 px-4 pt-4 md:px-8">
+    <motion.header
+      initial={{
+        opacity: 0,
+        y: -20,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.6,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      className="absolute left-0 right-0 top-0 z-50 px-4 pt-5 md:px-8 md:pt-6"
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-purple-500/10 bg-black/60 px-5 shadow-[0_0_30px_rgba(168,85,247,0.04)] backdrop-blur-xl md:px-7">
 
-        {/* Logo */}
+        {/* LOGO */}
         <button
           type="button"
           onClick={handleLogo}
@@ -82,13 +96,15 @@ export function Header() {
           </span>
         </button>
 
-        {/* Desktop navigation */}
+        {/* DESKTOP NAVIGATION */}
         <nav className="hidden items-center gap-7 md:flex">
           {links.map((link) => (
             <button
               key={link.href}
               type="button"
-              onClick={() => handleNavigation(link.href)}
+              onClick={() =>
+                handleNavigation(link.href)
+              }
               className="group relative font-mono text-[11px] uppercase tracking-[0.18em] text-gray-400 transition-colors duration-300 hover:text-white"
             >
               {link.label}
@@ -98,18 +114,20 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Desktop language */}
+        {/* DESKTOP LANGUAGE */}
         <div className="hidden items-center md:flex">
           <LanguageSwitcher />
         </div>
 
-        {/* Mobile actions */}
+        {/* MOBILE */}
         <div className="flex items-center gap-3 md:hidden">
           <LanguageSwitcher />
 
           <button
             type="button"
-            onClick={() => setIsOpen((prev) => !prev)}
+            onClick={() =>
+              setIsOpen((prev) => !prev)
+            }
             aria-label={
               isOpen
                 ? "Fechar menu"
@@ -126,7 +144,7 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* MOBILE MENU */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -148,7 +166,7 @@ export function Header() {
             transition={{
               duration: 0.2,
             }}
-            className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-2xl border border-purple-500/10 bg-black/90 p-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl md:hidden"
+            className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-2xl border border-purple-500/10 bg-black/95 p-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl md:hidden"
           >
             <nav className="flex flex-col">
               {links.map((link, index) => (
@@ -171,6 +189,6 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </motion.header>
   );
 }
