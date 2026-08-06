@@ -11,12 +11,10 @@ import {
 import { motion } from "framer-motion";
 import { Computer } from "./Computer";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { useLenisControls } from "@/hooks/useLenis";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export function ComputerSection() {
   const isMobile = useIsMobile();
-  const { stop, start } = useLenisControls();
   const { t } = useLanguage();
 
   if (isMobile) return null;
@@ -26,9 +24,6 @@ export function ComputerSection() {
       id="computador"
       className="relative w-full overflow-hidden bg-gradient-to-b from-black via-[#09050f] to-black"
     >
-      {/* =========================================================
-          TEXTO DA SEÇÃO
-      ========================================================= */}
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -78,9 +73,6 @@ export function ComputerSection() {
         </div>
       </motion.div>
 
-      {/* =========================================================
-          ÁREA DO COMPUTADOR 3D
-      ========================================================= */}
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         whileInView={{ opacity: 1, scale: 1 }}
@@ -92,10 +84,8 @@ export function ComputerSection() {
         }}
         className="relative mx-auto mt-10 h-[72vh] min-h-[560px] w-full max-w-[1500px] px-4 md:mt-12 md:px-8"
       >
-        {/* Borda da área interativa */}
         <div className="pointer-events-none absolute inset-x-4 inset-y-0 rounded-2xl border border-purple-500/20 shadow-[0_0_60px_rgba(168,85,247,0.05)] md:inset-x-8" />
 
-        {/* Badge superior */}
         <div className="pointer-events-none absolute left-1/2 top-0 z-20 -translate-x-1/2 -translate-y-1/2">
           <div className="rounded-full border border-purple-500/20 bg-black px-4 py-1.5 shadow-[0_0_20px_rgba(168,85,247,0.08)]">
             <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-purple-400/70">
@@ -104,13 +94,9 @@ export function ComputerSection() {
           </div>
         </div>
 
-        {/* =====================================================
-            SOMENTE ESSA ÁREA CONTROLA O THREE.JS
-        ===================================================== */}
         <div
+          data-lenis-prevent
           className="relative h-full overflow-hidden rounded-2xl"
-          onMouseEnter={stop}
-          onMouseLeave={start}
         >
           <Canvas
             shadows
@@ -122,10 +108,8 @@ export function ComputerSection() {
             }}
             className="absolute inset-0"
           >
-            {/* Luz ambiente */}
             <ambientLight intensity={0.5} />
 
-            {/* Luz principal */}
             <directionalLight
               position={[3, 5, 4]}
               intensity={2.8}
@@ -133,7 +117,6 @@ export function ComputerSection() {
               shadow-mapSize={[1024, 1024]}
             />
 
-            {/* Luz roxa lateral */}
             <pointLight
               position={[-3, 2, 1]}
               intensity={15}
@@ -141,7 +124,6 @@ export function ComputerSection() {
               distance={10}
             />
 
-            {/* Luz superior */}
             <spotLight
               position={[0, 4, -3]}
               angle={0.8}
@@ -165,7 +147,6 @@ export function ComputerSection() {
               />
             </Suspense>
 
-            {/* Sombra */}
             <ContactShadows
               position={[0, -1.05, 0]}
               opacity={0.6}
@@ -174,9 +155,6 @@ export function ComputerSection() {
               far={4}
             />
 
-            {/* =================================================
-                CONTROLE DO COMPUTADOR
-            ================================================= */}
             <OrbitControls
               makeDefault
               enableZoom={true}
@@ -191,9 +169,6 @@ export function ComputerSection() {
           </Canvas>
         </div>
 
-        {/* =====================================================
-            TEXTO SOBRE A ÁREA 3D
-        ===================================================== */}
         <div className="pointer-events-none absolute bottom-5 left-1/2 z-20 -translate-x-1/2">
           <div className="rounded-full border border-purple-400/10 bg-black/70 px-4 py-2 backdrop-blur-md">
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-gray-500">
@@ -203,9 +178,6 @@ export function ComputerSection() {
         </div>
       </motion.div>
 
-      {/* =========================================================
-          RODAPÉ DA SEÇÃO
-      ========================================================= */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

@@ -4,8 +4,18 @@ export const translations = {
       greeting: "// OLÁ, EU SOU",
       role: "Desenvolvedor Fullstack",
       description:
-        "Estudante do terceiro período de Engenharia de Software na Universidade Tecnológica Federal do Paraná, com experiência prática em desenvolvimento web, focado em frontend e integração com APIs. Trabalho com React, Next.js, Nest.js e Node.js construindo interfaces responsivas e sistemas completos, do zero à produção. Também possuo conhecimento em áreas como cloud (AWS) e banco de dados (PostgreSQL, MySQL), além de experiência com metodologias ágeis e possuir uma boa comunicação.",
+        "Estudante do terceiro período de Engenharia de Software na Universidade Tecnológica Federal do Paraná, com experiência prática em desenvolvimento web, focado em frontend e integração com APIs. \n\nTrabalho com React, Next.js, Nest.js e Node.js construindo interfaces responsivas e sistemas completos, do zero à produção. \n\nTambém possuo conhecimento em áreas como cloud (AWS) e banco de dados (PostgreSQL, MySQL), além de experiência com metodologias ágeis e possuir uma boa comunicação. \n\nAtualmente estou aprofundando meus conhecimentos em fullstack estudando NestJS, AWS e arquitetura de software.",
       explore: "↓ role para explorar",
+    },
+    certifications: {
+      label: "04 / CERTIFICAÇÕES",
+      title: "Certificações & Badges",
+      description:
+        "Credenciais que representam minha formação, conhecimentos técnicos e evolução profissional.",
+      certificationsTitle: "Certificações",
+      badgesTitle: "Badges",
+      viewCertificate: "Ver certificado",
+      viewBadge: "Ver badge",
     },
     header: {
       about: "Sobre",
@@ -14,6 +24,7 @@ export const translations = {
       certificates: "Certificações",
       contact: "Contato",
     },
+
     stack: {
       label: "TECHNICAL STACK",
       title: "Tecnologias & Conhecimento",
@@ -78,6 +89,14 @@ export const translations = {
       availableForWork: "Disponível para novas oportunidades",
     },
 
+    footer: {
+      description:
+        "Desenvolvedor Fullstack focado em criar aplicações web modernas, responsivas e escaláveis.",
+      navigation: "Navegação",
+      rights: "Todos os direitos reservados.",
+      builtWith: "Desenvolvido com Next.js",
+    },
+
     terminal: {
       system: "DANIEL OS v1.0 // SISTEMA INTERATIVO",
       systemLoaded: "Sistema Operacional v1.0.0 carregado.",
@@ -87,7 +106,8 @@ export const translations = {
       commands: {
         title: "COMANDOS DISPONIVEIS:",
         help: "exibe esta lista de comandos",
-        about: "resumo sobre o desenvolvedor",
+        about: "navega para a seção Sobre",
+        stack: "navega para a seção Stack",
         projects: "navega para a página de Projetos",
         contact: "navega para a página de Contato",
         github: "abre o perfil no GitHub",
@@ -95,6 +115,8 @@ export const translations = {
         clear: "limpa a tela do terminal",
       },
       messages: {
+        openingAbout: "Navegando para Sobre...",
+        openingStack: "Navegando para Stack...",
         openingProjects: "Abrindo projetos...",
         openingContact: "Abrindo contato...",
         openingGithub: "Redirecionando para o GitHub...",
@@ -110,15 +132,27 @@ export const translations = {
       greeting: "// HELLO, I'M",
       role: "Fullstack Developer",
       description:
-        "Third-semester Software Engineering student at the Federal University of Technology – Paraná, with practical experience in web development, focused on frontend development and API integration. I work with React, Next.js, Nest.js, and Node.js, building responsive interfaces and complete systems from scratch to production. I also have knowledge of cloud computing (AWS) and databases (PostgreSQL, MySQL), along with experience with agile methodologies and strong communication skills.",
+        "Third-semester Software Engineering student at the Federal University of Technology – Paraná, with practical experience in web development, focused on frontend development and API integration.\n\nI work with React, Next.js, Nest.js, and Node.js, building responsive interfaces and complete systems from scratch to production. I also have knowledge of cloud computing (AWS) and databases (PostgreSQL, MySQL), along with experience with agile methodologies and strong communication skills.\n\nCurrently, I am deepening my knowledge of fullstack development, studying NestJS, AWS, and software architecture.",
       explore: "↓ scroll to explore",
     },
+
     header: {
       about: "About",
       stack: "Stack",
       projects: "Projects",
       certificates: "Certificates",
       contact: "Contact",
+    },
+
+    certifications: {
+      label: "04 / CERTIFICATIONS",
+      title: "Certifications & Badges",
+      description:
+        "Credentials that represent my education, technical knowledge, and professional growth.",
+      certificationsTitle: "Certifications",
+      badgesTitle: "Badges",
+      viewCertificate: "View certificate",
+      viewBadge: "View badge",
     },
     stack: {
       label: "TECHNICAL STACK",
@@ -184,6 +218,14 @@ export const translations = {
       availableForWork: "Available for new opportunities",
     },
 
+    footer: {
+      description:
+        "Fullstack Developer focused on building modern, responsive, and scalable web applications.",
+      navigation: "Navigation",
+      rights: "All rights reserved.",
+      builtWith: "Built with Next.js",
+    },
+
     terminal: {
       system: "DANIEL OS v1.0 // INTERACTIVE SYSTEM",
       systemLoaded: "Operating System v1.0.0 loaded.",
@@ -193,7 +235,8 @@ export const translations = {
       commands: {
         title: "AVAILABLE COMMANDS:",
         help: "display this list of commands",
-        about: "about the developer",
+        about: "navigate to the About section",
+        stack: "navigate to the Stack section",
         projects: "navigate to the Projects page",
         contact: "navigate to the Contact page",
         github: "open GitHub profile",
@@ -201,6 +244,8 @@ export const translations = {
         clear: "clear the terminal",
       },
       messages: {
+        openingAbout: "Navigating to About...",
+        openingStack: "Navigating to Stack...",
         openingProjects: "Opening projects...",
         openingContact: "Opening contact...",
         openingGithub: "Redirecting to GitHub...",
@@ -213,4 +258,3 @@ export const translations = {
 } as const;
 
 export type Language = keyof typeof translations;
-

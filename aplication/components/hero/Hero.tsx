@@ -95,7 +95,7 @@ export function Hero() {
 
         <motion.p
           variants={itemVariants}
-          className="mb-8 leading-relaxed text-gray-400"
+          className="mb-8 whitespace-pre-line leading-relaxed text-gray-400"
         >
           {t.hero.description}
         </motion.p>

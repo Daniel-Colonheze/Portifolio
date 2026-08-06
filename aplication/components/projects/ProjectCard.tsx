@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { projects } from "@/data/projects";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -40,17 +41,14 @@ export function ProjectCard({
           ease: "easeOut",
         },
       }}
-      className="group relative flex min-h-[420px] flex-col overflow-hidden rounded-2xl border border-purple-500/10 bg-gradient-to-b from-purple-500/[0.045] to-transparent p-6 transition-colors duration-300 hover:border-purple-400/30"
+      className="group relative flex min-h-[620px] flex-col overflow-hidden rounded-2xl border border-purple-500/10 bg-gradient-to-b from-purple-500/[0.045] to-transparent p-6 transition-colors duration-300 hover:border-purple-400/30"
     >
-      {/* Glow */}
       <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-purple-600/[0.08] blur-[70px] transition-all duration-500 group-hover:bg-purple-500/[0.16]" />
 
-      {/* Inner glow */}
       <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-500 group-hover:opacity-100">
         <div className="absolute inset-0 rounded-2xl shadow-[inset_0_0_40px_rgba(168,85,247,0.04)]" />
       </div>
 
-      {/* Header */}
       <div className="relative z-10 flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-purple-400/60">
           {t.projects.projectLabel}{" "}
@@ -62,28 +60,47 @@ export function ProjectCard({
         </span>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 mt-8">
-        {/* Number */}
+      <div className="relative z-10 mt-6 overflow-hidden rounded-xl border border-purple-500/10 bg-black/40">
+        <div className="relative aspect-video w-full overflow-hidden">
+          {project.image ? (
+            <Image
+              src={project.image}
+              alt={projectTitle}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-purple-500/[0.03]">
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-600">
+                {t.projects.privateProject}
+              </span>
+            </div>
+          )}
+
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-purple-500/[0.03]" />
+
+          <div className="pointer-events-none absolute inset-0 border border-purple-400/0 rounded-xl transition-colors duration-500 group-hover:border-purple-400/20" />
+        </div>
+      </div>
+
+      <div className="relative z-10 mt-7">
         <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-purple-400/15 bg-purple-500/[0.05] text-purple-400 transition-all duration-300 group-hover:border-purple-400/30 group-hover:bg-purple-500/10 group-hover:shadow-[0_0_25px_rgba(168,85,247,0.12)]">
           <span className="font-mono text-lg">
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
 
-        {/* Title */}
         <h3 className="font-serif text-3xl text-white transition-colors duration-300 group-hover:text-purple-300">
           {projectTitle}
           <span className="text-purple-400">.</span>
         </h3>
 
-        {/* Description */}
         <p className="mt-4 text-sm leading-7 text-gray-400">
           {projectDescription}
         </p>
       </div>
 
-      {/* Technologies */}
       <div className="relative z-10 mt-7">
         <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.25em] text-gray-100">
           {t.projects.technologies}
@@ -101,7 +118,6 @@ export function ProjectCard({
         </div>
       </div>
 
-      {/* Link */}
       <div className="relative z-10 mt-auto pt-8">
         {project.link ? (
           <motion.a
@@ -124,7 +140,6 @@ export function ProjectCard({
         )}
       </div>
 
-      {/* Bottom line */}
       <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-purple-500 to-transparent transition-all duration-500 group-hover:w-full" />
     </motion.article>
   );

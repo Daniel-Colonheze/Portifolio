@@ -32,13 +32,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
       >
         <LanguageProvider>
-          <Header />
+        
 
-          <SmoothScroll>
-            {children}
+          <SmoothScroll>  
+            <Header />
+              {children}
+            <Footer />
           </SmoothScroll>
 
-          <Footer />
+          
         </LanguageProvider>
       </body>
     </html>

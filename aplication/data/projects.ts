@@ -10,7 +10,10 @@ export const projects = [
       en: "An interactive experience that uses a traffic intersection to demonstrate how concurrent processes can enter a circular wait state. The project explains the problem, allows users to visualize the deadlock happening, and demonstrates prevention strategies using access control.",
     },
     tags: ["React", "Next.js", "Tailwind CSS", "TypeScript"],
+    image: "/images/projects/deadlock.png",
     link: "https://simulador-de-deadlock-em-transito.vercel.app/",
+    repository:
+      "https://github.com/Daniel-Colonheze/Simulador-de-Deadlock-em-Transito",
   },
 
   {
@@ -31,20 +34,30 @@ export const projects = [
       "Leaflet",
       "Prisma",
     ],
+    image: "",
     link: "",
+    repository: "",
   },
 
   {
-    year: "2025",
+    year: "2026",
     title: {
-      pt: "Sistema de Gestão de Estoque",
-      en: "Inventory Management System",
+      pt: "Portfólio Pessoal",
+      en: "Personal Portfolio",
     },
     description: {
-      pt: "Sistema de controle de estoque desenvolvido para um cliente real, com autenticação segura, arquitetura em camadas (DAL) e deploy em produção.",
-      en: "Inventory management system developed for a real client, featuring secure authentication, a layered architecture (DAL), and production deployment.",
+      pt: "Portfólio pessoal desenvolvido com Next.js, combinando uma interface moderna com animações, interações em Three.js e uma experiência visual focada em apresentar meus projetos, conhecimentos e trajetória como desenvolvedor.",
+      en: "Personal portfolio built with Next.js, combining a modern interface with animations, Three.js interactions, and a visual experience focused on showcasing my projects, skills, and journey as a developer.",
     },
-    tags: ["Next.js", "PHP", "MySQL", "Docker"],
+    tags: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Three.js",
+    ],
+    image: "/images/projects/portfolio.png",
     link: "",
+    repository: "https://github.com/Daniel-Colonheze/Portifolio",
   },
 ];

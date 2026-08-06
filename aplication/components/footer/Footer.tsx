@@ -2,20 +2,41 @@
 
 import {
   FaGithub,
-  FaLinkedinIn,
-  FaEnvelope,
+  FaLinkedinIn
 } from "react-icons/fa";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useLenisControls } from "@/hooks/useLenis";
 
 export function Footer() {
   const { t } = useLanguage();
+  const { scrollTo } = useLenisControls();
 
   const links = [
-    { label: t.header.about, href: "/#sobre" },
-    { label: t.header.stack, href: "/#stack" },
-    { label: t.header.projects, href: "/projetos" },
-    { label: t.header.certificates, href: "/#certificados" },
-    { label: t.header.contact, href: "/contato" },
+    {
+      label: t.header.about,
+      href: "#sobre",
+      type: "section",
+    },
+    {
+      label: t.header.stack,
+      href: "#stack",
+      type: "section",
+    },
+    {
+      label: t.header.projects,
+      href: "/projetos",
+      type: "page",
+    },
+    {
+      label: t.header.certificates,
+      href: "#certificados",
+      type: "section",
+    },
+    {
+      label: t.header.contact,
+      href: "/contato",
+      type: "page",
+    },
   ];
 
   const socialLinks = [
@@ -29,12 +50,39 @@ export function Footer() {
       href: "https://www.linkedin.com/in/daniel-colonheze/",
       icon: FaLinkedinIn,
     },
-    {
-      label: "E-mail",
-      href: "mailto:danielcolonhze@gmail.com",
-      icon: FaEnvelope,
-    },
   ];
+
+  const handleNavigation = (
+    href: string,
+    type: string
+  ) => {
+    if (type === "page") {
+      window.location.href = href;
+      return;
+    }
+
+    if (window.location.pathname === "/") {
+      scrollTo(href, {
+        duration: 1.5,
+      });
+
+      return;
+    }
+
+    window.location.href = `/${href}`;
+  };
+
+  const handleLogoClick = () => {
+    if (window.location.pathname === "/") {
+      scrollTo("#sobre", {
+        duration: 1.5,
+      });
+
+      return;
+    }
+
+    window.location.href = "/#sobre";
+  };
 
   return (
     <footer className="relative overflow-hidden border-t border-purple-500/10 bg-black px-6 py-12 md:px-16">
@@ -43,15 +91,16 @@ export function Footer() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
           <div className="max-w-md">
-            <a
-              href="/#sobre"
+            <button
+              type="button"
+              onClick={handleLogoClick}
               className="font-mono text-lg font-semibold tracking-wider text-white transition-colors duration-300 hover:text-purple-200"
             >
               Daniel Colonheze
               <span className="text-purple-400">.</span>
-            </a>
+            </button>
 
-            <p className="mt-4 text-sm leading-7 text-gray-400">
+            <p className="mt-4 text-sm leading-7 text-gray-300">
               {t.footer.description}
             </p>
 
@@ -74,7 +123,7 @@ export function Footer() {
                         : undefined
                     }
                     aria-label={link.label}
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-purple-500/15 bg-purple-500/[0.04] text-gray-400 transition-all duration-300 hover:border-purple-400/40 hover:bg-purple-500/10 hover:text-purple-300"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-purple-500/15 bg-purple-500/[0.04] text-gray-300 transition-all duration-300 hover:border-purple-400/40 hover:bg-purple-500/10 hover:text-purple-300"
                   >
                     <Icon size={15} />
                   </a>
@@ -89,15 +138,35 @@ export function Footer() {
             </p>
 
             <nav className="grid grid-cols-2 gap-x-12 gap-y-4">
-              {links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="w-fit font-mono text-xs text-gray-400 transition-colors duration-300 hover:text-white"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {links.map((link) => {
+                if (link.type === "section") {
+                  return (
+                    <button
+                      key={link.href}
+                      type="button"
+                      onClick={() =>
+                        handleNavigation(
+                          link.href,
+                          link.type
+                        )
+                      }
+                      className="w-fit text-left font-mono text-xs text-gray-300 transition-colors duration-300 hover:text-white"
+                    >
+                      {link.label}
+                    </button>
+                  );
+                }
+
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="w-fit font-mono text-xs text-gray-300 transition-colors duration-300 hover:text-white"
+                  >
+                    {link.label}
+                  </a>
+                );
+              })}
             </nav>
           </div>
         </div>
@@ -110,7 +179,7 @@ export function Footer() {
             {t.footer.rights}
           </p>
 
-          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-600">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500">
             {t.footer.builtWith}
           </p>
         </div>

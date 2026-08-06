@@ -3,63 +3,58 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 import { LanguageSwitcher } from "../language/LanguageSwitcher";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useLenisControls } from "@/hooks/useLenis";
 
 export function Header() {
   const { t } = useLanguage();
+  const { scrollTo } = useLenisControls();
+  const pathname = usePathname();
+  const router = useRouter();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const links = [
-    { label: t.header.about, href: "/#sobre", section: true },
-    { label: t.header.stack, href: "/#stack", section: true },
-    { label: t.header.projects, href: "/projetos", section: false },
-    { label: t.header.certificates, href: "/#certificados", section: true },
-    { label: t.header.contact, href: "/contato", section: false },
+    { label: t.header.about, href: "#sobre" },
+    { label: t.header.stack, href: "#stack" },
+    { label: t.header.projects, href: "/projetos" },
+    { label: t.header.certificates, href: "#certificados" },
+    { label: t.header.contact, href: "/contato" },
   ];
 
-  const handleNavigation = (
-    href: string,
-    section: boolean
-  ) => {
+  const handleNavigation = (href: string) => {
     setIsOpen(false);
 
-    if (!section) {
-      window.location.href = href;
+    const isPage = href === "/projetos" || href === "/contato";
+
+    if (isPage) {
+      router.push(href);
       return;
     }
 
-    const hash = href.split("#")[1];
-
-    if (window.location.pathname === "/") {
-      const element = document.getElementById(hash);
-
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    } else {
-      window.location.href = href;
+    if (pathname !== "/") {
+      router.push(`/${href}`);
+      return;
     }
+
+    scrollTo(href, {
+      duration: 1.5,
+    });
   };
 
-  const handleLogoClick = () => {
+  const handleLogo = () => {
     setIsOpen(false);
 
-    if (window.location.pathname === "/") {
-      const element = document.getElementById("sobre");
-
-      if (element) {
-        element.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    } else {
-      window.location.href = "/#sobre";
+    if (pathname !== "/") {
+      router.push("/");
+      return;
     }
+
+    scrollTo("#sobre", {
+      duration: 1.5,
+    });
   };
 
   return (
@@ -67,7 +62,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-purple-500/10 bg-black/60 px-5 shadow-[0_0_30px_rgba(168,85,247,0.04)] backdrop-blur-xl md:px-7">
         <button
           type="button"
-          onClick={handleLogoClick}
+          onClick={handleLogo}
           className="group font-mono text-sm font-semibold tracking-wider text-white"
         >
           Daniel Colonheze
@@ -81,9 +76,7 @@ export function Header() {
             <button
               key={link.href}
               type="button"
-              onClick={() =>
-                handleNavigation(link.href, link.section)
-              }
+              onClick={() => handleNavigation(link.href)}
               className="group relative font-mono text-[11px] uppercase tracking-[0.18em] text-gray-400 transition-colors duration-300 hover:text-white"
             >
               {link.label}
@@ -125,9 +118,7 @@ export function Header() {
                 <button
                   key={link.href}
                   type="button"
-                  onClick={() =>
-                    handleNavigation(link.href, link.section)
-                  }
+                  onClick={() => handleNavigation(link.href)}
                   className="flex items-center justify-between rounded-xl px-4 py-4 text-left font-mono text-xs uppercase tracking-[0.18em] text-gray-400 transition-colors hover:bg-purple-500/[0.06] hover:text-white"
                 >
                   <span>{link.label}</span>
@@ -144,4 +135,3 @@ export function Header() {
     </header>
   );
 }
-

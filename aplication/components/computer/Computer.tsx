@@ -1,19 +1,30 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useGLTF, Html, Line } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useLenisControls } from "@/hooks/useLenis";
 import * as THREE from "three";
 
 const TARGET_HEIGHT = 2.2;
 
-
 export function Computer({ debug = false }) {
   const router = useRouter();
   const { t } = useLanguage();
-  const cableAnchorRef = useRef(new THREE.Vector3(0.3, 0.05, -0.4));
+  const { scrollTo } = useLenisControls();
+
+  const cableAnchorRef = useRef(
+    new THREE.Vector3(0.3, 0.05, -0.4)
+  );
+
   const [cablePoints, setCablePoints] = useState([
     [0, 0, 0],
     [0, 0, 0],
@@ -27,14 +38,19 @@ export function Computer({ debug = false }) {
   const innerRef = useRef<THREE.Group>(null);
   const mouseNodeRef = useRef<THREE.Object3D | null>(null);
   const keyNodesRef = useRef<THREE.Object3D[]>([]);
-  const activeKeys = useRef(new Map<THREE.Object3D, number>());
+  const activeKeys = useRef(
+    new Map<THREE.Object3D, number>()
+  );
+
   const visibleRef = useRef(true);
   const modelScaleRef = useRef(1);
 
   const [screenAnchor, setScreenAnchor] =
     useState<THREE.Object3D | null>(null);
 
-  const [terminalHistory, setTerminalHistory] = useState<string[]>([
+  const [terminalHistory, setTerminalHistory] = useState<
+    string[]
+  >([
     t.terminal.systemLoaded,
     t.terminal.help,
   ]);
@@ -57,7 +73,8 @@ export function Computer({ debug = false }) {
     box.getSize(size);
     box.getCenter(center);
 
-    const scale = TARGET_HEIGHT / Math.max(size.y, 0.001);
+    const scale =
+      TARGET_HEIGHT / Math.max(size.y, 0.001);
 
     inner.scale.setScalar(scale);
     modelScaleRef.current = scale;
@@ -73,19 +90,34 @@ export function Computer({ debug = false }) {
 
       inner.traverse((object) => {
         if (object.name) {
-          names.push(`${object.type}:${object.name}`);
+          names.push(
+            `${object.type}:${object.name}`
+          );
         }
       });
 
-      console.log("[Computer] nós do GLB:", names);
-      console.log("[Computer] tamanho:", size);
-      console.log("[Computer] escala:", scale);
+      console.log(
+        "[Computer] nós do GLB:",
+        names
+      );
+
+      console.log(
+        "[Computer] tamanho:",
+        size
+      );
+
+      console.log(
+        "[Computer] escala:",
+        scale
+      );
     }
   }, [model, debug]);
 
   useEffect(() => {
     const find = (
-      predicate: (object: THREE.Object3D) => boolean
+      predicate: (
+        object: THREE.Object3D
+      ) => boolean
     ): THREE.Object3D | null => {
       let found: THREE.Object3D | null = null;
 
@@ -103,34 +135,54 @@ export function Computer({ debug = false }) {
     );
 
     const monitor = find((object) =>
-      /(screen|tela|monitor|display)/i.test(object.name)
+      /(screen|tela|monitor|display)/i.test(
+        object.name
+      )
     );
 
     if (monitor) {
       monitor.updateWorldMatrix(true, false);
 
-      const box = new THREE.Box3().setFromObject(monitor);
+      const box = new THREE.Box3().setFromObject(
+        monitor
+      );
+
       const size = new THREE.Vector3();
       const worldCenter = new THREE.Vector3();
 
       box.getSize(size);
       box.getCenter(worldCenter);
 
-      const localCenter = monitor.worldToLocal(worldCenter.clone());
+      const localCenter = monitor.worldToLocal(
+        worldCenter.clone()
+      );
 
       const anchor = new THREE.Object3D();
+
       anchor.position.copy(localCenter);
 
       const frontOffset =
-        Math.min(size.x, size.y, size.z) / 2;
+        Math.min(
+          size.x,
+          size.y,
+          size.z
+        ) / 2;
 
-      anchor.position.y += frontOffset * 35;
-      anchor.position.x -= frontOffset * 20;
-      anchor.rotation.y = Math.PI / -2;
+      anchor.position.y +=
+        frontOffset * 35;
 
-      const compensScale = 1 / modelScaleRef.current;
+      anchor.position.x -=
+        frontOffset * 20;
 
-      anchor.scale.setScalar(compensScale);
+      anchor.rotation.y =
+        Math.PI / -2;
+
+      const compensScale =
+        1 / modelScaleRef.current;
+
+      anchor.scale.setScalar(
+        compensScale
+      );
 
       monitor.add(anchor);
 
@@ -163,7 +215,9 @@ export function Computer({ debug = false }) {
 
     const teclado = find(
       (object) =>
-        /teclado|keyboard/i.test(object.name) &&
+        /teclado|keyboard/i.test(
+          object.name
+        ) &&
         object.type === "Group"
     );
 
@@ -192,47 +246,64 @@ export function Computer({ debug = false }) {
   }, [model, debug]);
 
   useEffect(() => {
-    const element = document.getElementById("computador");
+    const element =
+      document.getElementById(
+        "computador"
+      );
 
     if (!element) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        visibleRef.current = entry.isIntersecting;
-      },
-      {
-        threshold: 0.4,
-      }
-    );
+    const observer =
+      new IntersectionObserver(
+        ([entry]) => {
+          visibleRef.current =
+            entry.isIntersecting;
+        },
+        {
+          threshold: 0.4,
+        }
+      );
 
     observer.observe(element);
 
-    return () => observer.disconnect();
+    return () =>
+      observer.disconnect();
   }, []);
 
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      const node = mouseNodeRef.current;
+    const handleMouseMove = (
+      event: MouseEvent
+    ) => {
+      const node =
+        mouseNodeRef.current;
 
       if (!node) return;
 
       const x =
-        (event.clientX / window.innerWidth - 0.5) * 4;
+        (event.clientX /
+          window.innerWidth -
+          0.5) *
+        4;
 
       const z =
-        (event.clientY / window.innerHeight - 0.5) * 4;
+        (event.clientY /
+          window.innerHeight -
+          0.5) *
+        4;
 
-      node.position.x = THREE.MathUtils.lerp(
-        node.position.x,
-        -z,
-        0.1
-      );
+      node.position.x =
+        THREE.MathUtils.lerp(
+          node.position.x,
+          -z,
+          0.1
+        );
 
-      node.position.z = THREE.MathUtils.lerp(
-        node.position.z,
-        x,
-        0.1
-      );
+      node.position.z =
+        THREE.MathUtils.lerp(
+          node.position.z,
+          x,
+          0.1
+        );
     };
 
     window.addEventListener(
@@ -248,14 +319,22 @@ export function Computer({ debug = false }) {
   }, []);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (
+      event: KeyboardEvent
+    ) => {
       if (!visibleRef.current) return;
 
-      const keys = keyNodesRef.current;
+      const keys =
+        keyNodesRef.current;
 
       if (keys.length > 0) {
         const randomKey =
-          keys[Math.floor(Math.random() * keys.length)];
+          keys[
+            Math.floor(
+              Math.random() *
+                keys.length
+            )
+          ];
 
         activeKeys.current.set(
           randomKey,
@@ -264,21 +343,28 @@ export function Computer({ debug = false }) {
       }
 
       if (event.key === "Enter") {
-        executeCommand(currentInput);
+        executeCommand(
+          currentInput
+        );
+
         setCurrentInput("");
+
         return;
       }
 
       if (event.key === "Backspace") {
-        setCurrentInput((previous) =>
-          previous.slice(0, -1)
+        setCurrentInput(
+          (previous) =>
+            previous.slice(0, -1)
         );
+
         return;
       }
 
       if (event.key.length === 1) {
-        setCurrentInput((previous) =>
-          previous + event.key
+        setCurrentInput(
+          (previous) =>
+            previous + event.key
         );
       }
     };
@@ -296,102 +382,273 @@ export function Computer({ debug = false }) {
   }, [currentInput]);
 
   useFrame(() => {
-    const now = performance.now();
+    const now =
+      performance.now();
 
     activeKeys.current.forEach(
       (startTime, key) => {
-        const elapsed = now - startTime;
+        const elapsed =
+          now - startTime;
+
         const duration = 150;
 
         if (elapsed < duration) {
           key.position.y =
             -Math.sin(
-              (elapsed / duration) * Math.PI
+              (elapsed / duration) *
+                Math.PI
             ) * 0.5;
         } else {
           key.position.y = 0;
-          activeKeys.current.delete(key);
+
+          activeKeys.current.delete(
+            key
+          );
         }
       }
     );
 
     if (mouseNodeRef.current) {
       const mousePosition =
-        mouseNodeRef.current.position;
+        mouseNodeRef.current
+          .position;
 
-      const anchor = cableAnchorRef.current;
+      const anchor =
+        cableAnchorRef.current;
 
       const midPoint = [
-        (anchor.x + mousePosition.x) / 2,
-        Math.min(anchor.y, 0) - 0.15,
-        (anchor.z + mousePosition.z) / 2,
-      ] as [number, number, number];
+        (anchor.x +
+          mousePosition.x) /
+          2,
+
+        Math.min(
+          anchor.y,
+          0
+        ) - 0.15,
+
+        (anchor.z +
+          mousePosition.z) /
+          2,
+      ] as [
+        number,
+        number,
+        number
+      ];
 
       setCablePoints([
-        [anchor.x, anchor.y, anchor.z],
+        [
+          anchor.x,
+          anchor.y,
+          anchor.z,
+        ],
+
         midPoint,
-        [mousePosition.x, 0, mousePosition.z],
+
+        [
+          mousePosition.x,
+          0,
+          mousePosition.z,
+        ],
       ]);
     }
   });
 
-const executeCommand = (command: string) => {
-  const trimmed = command.trim().toLowerCase();
-  if (!trimmed) return;
+  const executeCommand = (
+    command: string
+  ) => {
+    const trimmed =
+      command
+        .trim()
+        .toLowerCase();
 
-  if (trimmed === "projects" || trimmed === "projetos") {
-    setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingProjects]);
-    router.push("/projetos");
-    return;
-  }
+    if (!trimmed) return;
 
-  if (trimmed === "contact" || trimmed === "contato") {
-    setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingContact]);
-    router.push("/contato");
-    return;
-  }
+    // ==========================================
+    // SOBRE
+    // ==========================================
 
-  if (trimmed === "github") {
-    window.open("https://github.com/Daniel-Colonheze", "_blank");
-    setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingGithub]);
-    return;
-  }
+    if (
+      trimmed === "about" ||
+      trimmed === "sobre"
+    ) {
+      setTerminalHistory(
+        (previous) => [
+          ...previous,
+          `$ ${command}`,
+          t.terminal.messages
+            .openingAbout,
+        ]
+      );
 
-  if (trimmed === "linkedin") {
-    window.open("https://www.linkedin.com/in/daniel-colonheze/", "_blank");
-    setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingLinkedin]);
-    return;
-  }
+      scrollTo("#sobre", {
+        duration: 1.5,
+      });
 
-  let output = "";
-
-  switch (trimmed) {
-    case "help":
-      output =
-        `${t.terminal.commands.title}\n` +
-        `  help      - ${t.terminal.commands.help}\n` +
-        `  about     - ${t.terminal.commands.about}\n` +
-        `  projects  - ${t.terminal.commands.projects}\n` +
-        `  contact   - ${t.terminal.commands.contact}\n` +
-        `  github    - ${t.terminal.commands.github}\n` +
-        `  linkedin  - ${t.terminal.commands.linkedin}\n` +
-        `  clear     - ${t.terminal.commands.clear}`;
-      break;
-
-    case "about":
-      output = t.terminal.aboutText;
-      break;
-
-    case "clear":
-      setTerminalHistory([]);
       return;
+    }
 
-    default:
-      output = t.terminal.messages.commandNotFound.replace("{command}", command);
-  }
+    // ==========================================
+    // STACK
+    // ==========================================
 
-  setTerminalHistory((previous) => [...previous, `$ ${command}`, output]);
-};
+    if (
+      trimmed === "stack" ||
+      trimmed === "tecnologias"
+    ) {
+      setTerminalHistory(
+        (previous) => [
+          ...previous,
+          `$ ${command}`,
+          t.terminal.messages
+            .openingStack,
+        ]
+      );
+
+      scrollTo("#stack", {
+        duration: 1.5,
+      });
+
+      return;
+    }
+
+    // ==========================================
+    // PROJETOS
+    // ==========================================
+
+    if (
+      trimmed === "projects" ||
+      trimmed === "projetos"
+    ) {
+      setTerminalHistory(
+        (previous) => [
+          ...previous,
+          `$ ${command}`,
+          t.terminal.messages
+            .openingProjects,
+        ]
+      );
+
+      router.push(
+        "/projetos"
+      );
+
+      return;
+    }
+
+    // ==========================================
+    // CONTATO
+    // ==========================================
+
+    if (
+      trimmed === "contact" ||
+      trimmed === "contato"
+    ) {
+      setTerminalHistory(
+        (previous) => [
+          ...previous,
+          `$ ${command}`,
+          t.terminal.messages
+            .openingContact,
+        ]
+      );
+
+      router.push(
+        "/contato"
+      );
+
+      return;
+    }
+
+    // ==========================================
+    // GITHUB
+    // ==========================================
+
+    if (
+      trimmed === "github"
+    ) {
+      window.open(
+        "https://github.com/Daniel-Colonheze",
+        "_blank"
+      );
+
+      setTerminalHistory(
+        (previous) => [
+          ...previous,
+          `$ ${command}`,
+          t.terminal.messages
+            .openingGithub,
+        ]
+      );
+
+      return;
+    }
+
+    // ==========================================
+    // LINKEDIN
+    // ==========================================
+
+    if (
+      trimmed === "linkedin"
+    ) {
+      window.open(
+        "https://www.linkedin.com/in/daniel-colonheze/",
+        "_blank"
+      );
+
+      setTerminalHistory(
+        (previous) => [
+          ...previous,
+          `$ ${command}`,
+          t.terminal.messages
+            .openingLinkedin,
+        ]
+      );
+
+      return;
+    }
+
+    // ==========================================
+    // COMANDOS INTERNOS
+    // ==========================================
+
+    let output = "";
+
+    switch (trimmed) {
+      case "help":
+        output =
+          `${t.terminal.commands.title}\n` +
+          `  help      - ${t.terminal.commands.help}\n` +
+          `  about     - ${t.terminal.commands.about}\n` +
+          `  stack     - ${t.terminal.commands.stack}\n` +
+          `  projects  - ${t.terminal.commands.projects}\n` +
+          `  contact   - ${t.terminal.commands.contact}\n` +
+          `  github    - ${t.terminal.commands.github}\n` +
+          `  linkedin  - ${t.terminal.commands.linkedin}\n` +
+          `  clear     - ${t.terminal.commands.clear}`;
+
+        break;
+
+      case "clear":
+        setTerminalHistory([]);
+        return;
+
+      default:
+        output =
+          t.terminal.messages
+            .commandNotFound.replace(
+              "{command}",
+              command
+            );
+    }
+
+    setTerminalHistory(
+      (previous) => [
+        ...previous,
+        `$ ${command}`,
+        output,
+      ]
+    );
+  };
 
   const screenContent = (
     <div className="flex h-full flex-col">
@@ -400,21 +657,25 @@ const executeCommand = (command: string) => {
           {t.terminal.system}
         </div>
 
-        {terminalHistory.map((line, index) => (
-          <pre
-            key={index}
-            className="m-0 whitespace-pre-wrap"
-          >
-            {line}
-          </pre>
-        ))}
+        {terminalHistory.map(
+          (line, index) => (
+            <pre
+              key={index}
+              className="m-0 whitespace-pre-wrap"
+            >
+              {line}
+            </pre>
+          )
+        )}
 
         <div className="mt-1 flex gap-1 text-purple-100">
           <span className="text-purple-400">
             $
           </span>
 
-          <span>{currentInput}</span>
+          <span>
+            {currentInput}
+          </span>
 
           <span className="animate-pulse">
             ▊
@@ -432,21 +693,24 @@ const executeCommand = (command: string) => {
       <group ref={innerRef}>
         <primitive object={model} />
 
-        {anchorReady && screenAnchor && (
-          <primitive object={screenAnchor}>
-            <Html
-              transform
-              occlude={false}
-              distanceFactor={0.65}
-              zIndexRange={[1, 0]}
-              className="pointer-events-auto"
+        {anchorReady &&
+          screenAnchor && (
+            <primitive
+              object={screenAnchor}
             >
-              <div className="h-[320px] w-[550px] overflow-hidden rounded-sm border border-purple-900/70 bg-black/95 p-3 shadow-[0_0_40px_rgba(168,85,247,0.35)]">
-                {screenContent}
-              </div>
-            </Html>
-          </primitive>
-        )}
+              <Html
+                transform
+                occlude={false}
+                distanceFactor={0.65}
+                zIndexRange={[1, 0]}
+                className="pointer-events-none"
+              >
+                <div className="h-[320px] w-[550px] overflow-hidden rounded-sm border border-purple-900/70 bg-black/95 p-3 shadow-[0_0_40px_rgba(168,85,247,0.35)]">
+                  {screenContent}
+                </div>
+              </Html>
+            </primitive>
+          )}
 
         <Line
           points={cablePoints}
@@ -459,4 +723,6 @@ const executeCommand = (command: string) => {
   );
 }
 
-useGLTF.preload("/models/desktop.glb");
+useGLTF.preload(
+  "/models/desktop.glb"
+);
