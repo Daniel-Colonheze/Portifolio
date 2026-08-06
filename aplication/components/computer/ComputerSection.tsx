@@ -12,20 +12,23 @@ import { motion } from "framer-motion";
 import { Computer } from "./Computer";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useLenisControls } from "@/hooks/useLenis";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export function ComputerSection() {
   const isMobile = useIsMobile();
   const { stop, start } = useLenisControls();
+  const { t } = useLanguage();
 
   if (isMobile) return null;
 
   return (
     <section
       id="computador"
-      onMouseEnter={stop}
-      onMouseLeave={start}
       className="relative w-full overflow-hidden bg-gradient-to-b from-black via-[#09050f] to-black"
     >
+      {/* =========================================================
+          TEXTO DA SEÇÃO
+      ========================================================= */}
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -37,43 +40,47 @@ export function ComputerSection() {
         className="relative z-20 mx-auto max-w-4xl px-6 pt-20 text-center md:pt-24"
       >
         <span className="font-mono text-[10px] uppercase tracking-[0.4em] text-purple-400/70 md:text-xs">
-          Interactive Computer
+          {t.computer.label}
         </span>
 
         <h2 className="mt-3 font-mono text-2xl font-semibold tracking-wider text-white md:text-4xl">
-          Explore meu computador
+          {t.computer.title}
         </h2>
 
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-gray-400 md:text-base">
-          Arraste para rotacionar o computador, use o scroll para aproximar
-          ou afastar e interaja com os elementos da tela para explorar meu
-          portfólio.
+          {t.computer.description}
         </p>
 
         <div className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
           <div className="flex items-center gap-2 rounded-full border border-purple-400/15 bg-purple-500/[0.04] px-4 py-2">
             <span className="text-sm text-purple-400">↔</span>
+
             <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400">
-              Arrastar
+              {t.computer.drag}
             </span>
           </div>
 
           <div className="flex items-center gap-2 rounded-full border border-purple-400/15 bg-purple-500/[0.04] px-4 py-2">
             <span className="text-sm text-purple-400">↕</span>
+
             <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400">
-              Scroll
+              {t.computer.scroll}
             </span>
           </div>
 
           <div className="flex items-center gap-2 rounded-full border border-purple-400/15 bg-purple-500/[0.04] px-4 py-2">
             <span className="text-sm text-purple-400">⌁</span>
+
             <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400">
-              Interagir
+              {t.computer.interact}
             </span>
           </div>
         </div>
       </motion.div>
 
+      {/* =========================================================
+          ÁREA DO COMPUTADOR 3D
+      ========================================================= */}
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         whileInView={{ opacity: 1, scale: 1 }}
@@ -85,26 +92,40 @@ export function ComputerSection() {
         }}
         className="relative mx-auto mt-10 h-[72vh] min-h-[560px] w-full max-w-[1500px] px-4 md:mt-12 md:px-8"
       >
+        {/* Borda da área interativa */}
         <div className="pointer-events-none absolute inset-x-4 inset-y-0 rounded-2xl border border-purple-500/20 shadow-[0_0_60px_rgba(168,85,247,0.05)] md:inset-x-8" />
 
+        {/* Badge superior */}
         <div className="pointer-events-none absolute left-1/2 top-0 z-20 -translate-x-1/2 -translate-y-1/2">
           <div className="rounded-full border border-purple-500/20 bg-black px-4 py-1.5 shadow-[0_0_20px_rgba(168,85,247,0.08)]">
             <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-purple-400/70">
-              Interactive Area
+              {t.computer.interactiveArea}
             </span>
           </div>
         </div>
 
-        <div className="relative h-full overflow-hidden rounded-2xl">
+        {/* =====================================================
+            SOMENTE ESSA ÁREA CONTROLA O THREE.JS
+        ===================================================== */}
+        <div
+          className="relative h-full overflow-hidden rounded-2xl"
+          onMouseEnter={stop}
+          onMouseLeave={start}
+        >
           <Canvas
             shadows
             dpr={[1, 2]}
             gl={{ antialias: true }}
-            camera={{ position: [0, 1.1, 3.8], fov: 40 }}
+            camera={{
+              position: [0, 1.1, 3.8],
+              fov: 40,
+            }}
             className="absolute inset-0"
           >
+            {/* Luz ambiente */}
             <ambientLight intensity={0.5} />
 
+            {/* Luz principal */}
             <directionalLight
               position={[3, 5, 4]}
               intensity={2.8}
@@ -112,6 +133,7 @@ export function ComputerSection() {
               shadow-mapSize={[1024, 1024]}
             />
 
+            {/* Luz roxa lateral */}
             <pointLight
               position={[-3, 2, 1]}
               intensity={15}
@@ -119,6 +141,7 @@ export function ComputerSection() {
               distance={10}
             />
 
+            {/* Luz superior */}
             <spotLight
               position={[0, 4, -3]}
               angle={0.8}
@@ -142,6 +165,7 @@ export function ComputerSection() {
               />
             </Suspense>
 
+            {/* Sombra */}
             <ContactShadows
               position={[0, -1.05, 0]}
               opacity={0.6}
@@ -150,28 +174,38 @@ export function ComputerSection() {
               far={4}
             />
 
+            {/* =================================================
+                CONTROLE DO COMPUTADOR
+            ================================================= */}
             <OrbitControls
               makeDefault
-              enableZoom
+              enableZoom={true}
+              enableRotate={true}
+              enablePan={false}
               minDistance={1}
               maxDistance={6}
               minPolarAngle={Math.PI / 6}
               maxPolarAngle={Math.PI / 2}
-              enablePan={false}
               target={[0.2, 0.8, 0]}
             />
           </Canvas>
         </div>
 
+        {/* =====================================================
+            TEXTO SOBRE A ÁREA 3D
+        ===================================================== */}
         <div className="pointer-events-none absolute bottom-5 left-1/2 z-20 -translate-x-1/2">
           <div className="rounded-full border border-purple-400/10 bg-black/70 px-4 py-2 backdrop-blur-md">
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-gray-500">
-              Arraste para explorar • Scroll para zoom
+              {t.computer.dragToExplore}
             </span>
           </div>
         </div>
       </motion.div>
 
+      {/* =========================================================
+          RODAPÉ DA SEÇÃO
+      ========================================================= */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -186,15 +220,13 @@ export function ComputerSection() {
         <div className="mx-auto mb-5 h-px w-12 bg-purple-500/30" />
 
         <p className="font-mono text-[9px] uppercase tracking-[0.35em] text-purple-400/50">
-          Explore
+          {t.computer.explore}
         </p>
 
         <p className="mt-3 text-xs leading-6 text-gray-600">
-          Passe o cursor sobre a área interativa para controlar o computador
-          sem interferir no scroll da página.
+          {t.computer.footer}
         </p>
       </motion.div>
     </section>
   );
 }
-

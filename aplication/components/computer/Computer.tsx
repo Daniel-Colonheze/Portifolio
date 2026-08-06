@@ -124,7 +124,7 @@ export function Computer({ debug = false }) {
       const frontOffset =
         Math.min(size.x, size.y, size.z) / 2;
 
-      anchor.position.y += frontOffset * -50;
+      anchor.position.y += frontOffset * 35;
       anchor.position.x -= frontOffset * 20;
       anchor.rotation.y = Math.PI / -2;
 

@@ -1,19 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  ArrowUpRight,
-  Mail,
-} from "lucide-react";
-import {
-  FaGithub,
-  FaLinkedin,
-  FaWhatsapp,
-} from "react-icons/fa";
+import { ArrowUpRight, Mail } from "lucide-react";
+import { FaGithub, FaLinkedin, FaWhatsapp } from "react-icons/fa";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useLenisControls } from "@/hooks/useLenis";
 
 export function Contact() {
   const { t } = useLanguage();
+  const { start } = useLenisControls();
 
   const whatsappMessage = encodeURIComponent(
     "Olá Daniel! Vi seu portfólio e gostaria de conversar."
@@ -22,9 +17,9 @@ export function Contact() {
   return (
     <section
       id="contato"
+      onMouseEnter={start}
       className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black px-6 py-24 md:px-16"
     >
-      {/* Glow de fundo */}
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-700/[0.06] blur-[140px]" />
 
       <motion.div
@@ -68,10 +63,7 @@ export function Contact() {
           className="group mx-auto mt-10 flex w-fit items-center gap-3 rounded-full border border-purple-400/30 bg-purple-500/10 px-7 py-4 font-mono text-sm text-purple-200 shadow-[0_0_30px_rgba(168,85,247,0.08)] transition-all duration-300 hover:border-purple-400/60 hover:bg-purple-500/15 hover:shadow-[0_0_35px_rgba(168,85,247,0.15)]"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-400/15">
-            <FaWhatsapp
-              size={18}
-              className="text-purple-300"
-            />
+            <FaWhatsapp size={18} className="text-purple-300" />
           </span>
 
           <span>{t.contact.whatsapp}</span>
@@ -88,7 +80,6 @@ export function Contact() {
 
         {/* Cards */}
         <div className="mx-auto mt-10 grid w-full max-w-2xl gap-4 md:grid-cols-3">
-
           {/* E-mail */}
           <motion.a
             href="mailto:danielcolonhze@gmail.com"
@@ -178,4 +169,3 @@ export function Contact() {
     </section>
   );
 }
-

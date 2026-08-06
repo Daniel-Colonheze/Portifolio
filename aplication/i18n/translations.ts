@@ -4,25 +4,52 @@ export const translations = {
       greeting: "// OLÁ, EU SOU",
       role: "Desenvolvedor Fullstack",
       description:
-        "Estudante de Engenharia de Software com experiência prática em desenvolvimento web, focado em frontend e integração com APIs. Trabalho com React, Next.js, Nest.js e Node.js construindo interfaces responsivas e sistemas completos, do zero à produção.",
+        "Estudante do terceiro período de Engenharia de Software na Universidade Tecnológica Federal do Paraná, com experiência prática em desenvolvimento web, focado em frontend e integração com APIs. Trabalho com React, Next.js, Nest.js e Node.js construindo interfaces responsivas e sistemas completos, do zero à produção. Também possuo conhecimento em áreas como cloud (AWS) e banco de dados (PostgreSQL, MySQL), além de experiência com metodologias ágeis e possuir uma boa comunicação.",
       explore: "↓ role para explorar",
     },
-
+    header: {
+      about: "Sobre",
+      stack: "Stack",
+      projects: "Projetos",
+      certificates: "Certificações",
+      contact: "Contato",
+    },
     stack: {
       label: "TECHNICAL STACK",
       title: "Tecnologias & Conhecimento",
       subtitle: "Nível de familiaridade",
       slideHint: "deslize para explorar",
+
+      categories: {
+        all: "Todos",
+        frontend: "Frontend",
+        backend: "Backend",
+        tools: "Ferramentas",
+      },
     },
 
     computer: {
       label: "COMPUTADOR INTERATIVO",
-      title: "Como utilizar",
+      title: "Explore o computador",
       description:
-        "Arraste o computador para rotacioná-lo, use o scroll do mouse para aproximar ou afastar e interaja com os elementos da tela para explorar o portfólio (digite help para ver os comandos).",
-      drag: "↔ Arrastar",
-      scroll: "↑↓ Scroll",
-      interact: "🖱 Interagir",
+        "Digite os comando 'help' para aparecer as opções para acessar os projetos e contato. O zoom funciona apenas dentro da animação do Three.js, então se você quiser subir de volta use a barra lateral. Arraste para rotacionar o computador, use o scroll para aproximar ou afastar e interaja com os elementos da tela para explorar meu portfólio.",
+      drag: "Arrastar",
+      scroll: "Scroll",
+      interact: "Interagir",
+      interactiveArea: "ÁREA INTERATIVA",
+      dragToExplore: "Arraste para explorar • Scroll para zoom",
+      explore: "EXPLORE",
+      footer:
+        "Passe o cursor sobre a área interativa para controlar o computador sem interferir no scroll da página.",
+    },
+
+    mobileNavigation: {
+      label: "NAVEGAÇÃO",
+      title: "Explore meu portfólio",
+      description:
+        "Acesse meus projetos ou entre em contato comigo para conhecer mais sobre meu trabalho.",
+      projects: "Projetos",
+      contact: "Contato",
     },
 
     projects: {
@@ -56,7 +83,7 @@ export const translations = {
       systemLoaded: "Sistema Operacional v1.0.0 carregado.",
       help: "Digite 'help' para listar os comandos disponíveis.",
       aboutText:
-        "Daniel Colonheze | Desenvolvedor Frontend\nEstudante de Engenharia de Software com foco em React, Next.js, Node.js e construção de interfaces 3D interativas.",
+        "Gosto de desenvolver utilizando ideias criativas e inovadoras, dessa forma montando sistemas completos e interativos. Para mim, desenvolver é um processo constante de aprender, experimentar e evoluir. É isso que torna cada projeto uma oportunidade de fazer algo melhor do que o anterior.",
       commands: {
         title: "COMANDOS DISPONIVEIS:",
         help: "exibe esta lista de comandos",
@@ -83,25 +110,52 @@ export const translations = {
       greeting: "// HELLO, I'M",
       role: "Fullstack Developer",
       description:
-        "Software Engineering student with practical experience in web development, focused on frontend development and API integration. I work with React, Next.js, Nest.js and Node.js, building responsive interfaces and complete systems from scratch to production.",
+        "Third-semester Software Engineering student at the Federal University of Technology – Paraná, with practical experience in web development, focused on frontend development and API integration. I work with React, Next.js, Nest.js, and Node.js, building responsive interfaces and complete systems from scratch to production. I also have knowledge of cloud computing (AWS) and databases (PostgreSQL, MySQL), along with experience with agile methodologies and strong communication skills.",
       explore: "↓ scroll to explore",
     },
-
+    header: {
+      about: "About",
+      stack: "Stack",
+      projects: "Projects",
+      certificates: "Certificates",
+      contact: "Contact",
+    },
     stack: {
       label: "TECHNICAL STACK",
       title: "Technologies & Knowledge",
       subtitle: "Familiarity level",
       slideHint: "swipe to explore",
+
+      categories: {
+        all: "All",
+        frontend: "Frontend",
+        backend: "Backend",
+        tools: "Tools",
+      },
     },
 
     computer: {
       label: "INTERACTIVE COMPUTER",
-      title: "How to use",
+      title: "Explore the computer",
       description:
-        "Drag the computer to rotate it, use the mouse wheel to zoom in or out, and interact with the elements on the screen to explore the portfolio (type help for commands).",
-      drag: "↔ Drag",
-      scroll: "↑↓ Scroll",
-      interact: "🖱 Interact",
+        "Type 'help' to see the available commands to access projects and contact. The zoom works only within the Three.js animation, so if you want to go back up, use the sidebar. Drag to rotate the computer, use the scroll wheel to zoom in or out, and interact with the elements on the screen to explore my portfolio.",
+      drag: "Drag",
+      scroll: "Scroll",
+      interact: "Interact",
+      interactiveArea: "INTERACTIVE AREA",
+      dragToExplore: "Drag to explore • Scroll to zoom",
+      explore: "EXPLORE",
+      footer:
+        "Hover over the interactive area to control the computer without interfering with the page scroll.",
+    },
+
+    mobileNavigation: {
+      label: "NAVIGATION",
+      title: "Explore my portfolio",
+      description:
+        "Explore my projects or get in touch with me to learn more about my work.",
+      projects: "Projects",
+      contact: "Contact",
     },
 
     projects: {
@@ -135,7 +189,7 @@ export const translations = {
       systemLoaded: "Operating System v1.0.0 loaded.",
       help: "Type 'help' to list available commands.",
       aboutText:
-        "Daniel Colonheze | Frontend Developer\nSoftware Engineering student focused on React, Next.js, Node.js and building interactive 3D interfaces.",
+        "I enjoy developing using creative and innovative ideas, building complete and interactive systems. For me, development is a constant process of learning, experimenting, and evolving. That's what makes every project an opportunity to create something better than the last.",
       commands: {
         title: "AVAILABLE COMMANDS:",
         help: "display this list of commands",
@@ -159,3 +213,4 @@ export const translations = {
 } as const;
 
 export type Language = keyof typeof translations;
+

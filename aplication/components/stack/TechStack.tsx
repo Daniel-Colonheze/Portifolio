@@ -11,44 +11,174 @@ import {
   SiPostgresql,
   SiDocker,
   SiGit,
+  SiFigma,
+  SiNestjs,
 } from "react-icons/si";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-export const stack = [
-  { name: "JavaScript", level: 90, icon: SiJavascript, color: "#f7df1e" },
-  { name: "TypeScript", level: 85, icon: SiTypescript, color: "#3178c6" },
-  { name: "React", level: 88, icon: SiReact, color: "#61dafb" },
-  { name: "Next.js", level: 82, icon: SiNextdotjs, color: "#ffffff" },
-  { name: "Node.js", level: 75, icon: SiNodedotjs, color: "#339933" },
-  { name: "Tailwind", level: 80, icon: SiTailwindcss, color: "#06b6d4" },
-  { name: "PostgreSQL", level: 70, icon: SiPostgresql, color: "#4169e1" },
-  { name: "Docker", level: 65, icon: SiDocker, color: "#2496f3" },
-  { name: "Git", level: 85, icon: SiGit, color: "#f05032" },
+type Category = "all" | "frontend" | "backend" | "tools";
+
+type Technology = {
+  name: string;
+  level: number;
+  icon: React.ElementType;
+  color: string;
+  category: Exclude<Category, "all">;
+};
+
+export const stack: Technology[] = [
+  {
+    name: "JavaScript",
+    level: 90,
+    icon: SiJavascript,
+    color: "#f7df1e",
+    category: "frontend",
+  },
+  {
+    name: "TypeScript",
+    level: 85,
+    icon: SiTypescript,
+    color: "#3178c6",
+    category: "frontend",
+  },
+  {
+    name: "React",
+    level: 88,
+    icon: SiReact,
+    color: "#61dafb",
+    category: "frontend",
+  },
+  {
+    name: "Next.js",
+    level: 82,
+    icon: SiNextdotjs,
+    color: "#ffffff",
+    category: "frontend",
+  },
+  {
+    name: "Tailwind",
+    level: 80,
+    icon: SiTailwindcss,
+    color: "#06b6d4",
+    category: "frontend",
+  },
+  {
+    name: "Node.js",
+    level: 75,
+    icon: SiNodedotjs,
+    color: "#339933",
+    category: "backend",
+  },
+  {
+    name: "Nest.js",
+    level: 70,
+    icon: SiNestjs,
+    color: "#e0234e",
+    category: "backend",
+  },
+  {
+    name: "PostgreSQL",
+    level: 70,
+    icon: SiPostgresql,
+    color: "#4169e1",
+    category: "backend",
+  },
+  {
+    name: "Docker",
+    level: 65,
+    icon: SiDocker,
+    color: "#2496f3",
+    category: "tools",
+  },
+  {
+    name: "Git",
+    level: 85,
+    icon: SiGit,
+    color: "#f05032",
+    category: "tools",
+  },
+  {
+    name: "Figma",
+    level: 80,
+    icon: SiFigma,
+    color: "#f24e1e",
+    category: "tools",
+  },
 ];
 
 const containerVariants = {
-  hidden: { opacity: 0, y: 60 },
+  hidden: {
+    opacity: 0,
+    y: 60,
+  },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1], staggerChildren: 0.08 },
+    transition: {
+      duration: 0.8,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.08,
+    },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 35 },
+  hidden: {
+    opacity: 0,
+    y: 35,
+  },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+    },
   },
 };
 
 export function TechStack() {
-  const { t } = useLanguage(); // NOVO
+  const { t } = useLanguage();
+
+  const [activeCategory, setActiveCategory] =
+    useState<Category>("all");
+
+  const filteredStack =
+    activeCategory === "all"
+      ? stack
+      : stack.filter(
+          (tech) => tech.category === activeCategory
+        );
+
+  const categories: {
+    key: Category;
+    label: string;
+  }[] = [
+    {
+      key: "all",
+      label: t.stack.categories.all,
+    },
+    {
+      key: "frontend",
+      label: t.stack.categories.frontend,
+    },
+    {
+      key: "backend",
+      label: t.stack.categories.backend,
+    },
+    {
+      key: "tools",
+      label: t.stack.categories.tools,
+    },
+  ];
 
   return (
-    <section className="relative overflow-hidden border-y border-purple-500/10 bg-black py-20 md:py-28">
+    <section 
+      id="stack"
+      className="relative overflow-hidden border-y border-purple-500/10 bg-black py-20 md:py-28"
+    >
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-600/[0.06] blur-[140px]" />
 
       <motion.div
@@ -58,13 +188,17 @@ export function TechStack() {
         viewport={{ once: false, amount: 0.2 }}
         className="relative mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12"
       >
-        <motion.div variants={itemVariants} className="mb-14 text-center md:mb-16">
+        {/* HEADER */}
+        <motion.div
+          variants={itemVariants}
+          className="mb-10 text-center md:mb-12"
+        >
           <span className="font-mono text-xs uppercase tracking-[0.4em] text-purple-400/80">
-            {t.stack.label} {/* trocado */}
+            {t.stack.label}
           </span>
 
           <h2 className="mt-3 font-mono text-3xl font-semibold tracking-wider text-white md:text-4xl">
-            {t.stack.title} {/* trocado */}
+            {t.stack.title}
           </h2>
 
           <motion.div
@@ -76,15 +210,19 @@ export function TechStack() {
           />
         </motion.div>
 
-        <motion.div variants={itemVariants} className="mx-auto w-full max-w-6xl">
-          <div className="mb-8 flex items-end justify-between px-1">
+        <motion.div
+          variants={itemVariants}
+          className="mx-auto w-full max-w-6xl"
+        >
+          {/* SUBHEADER */}
+          <div className="mb-7 flex flex-col gap-5 px-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="font-mono text-xs uppercase tracking-[0.3em] text-purple-400/70">
-                {t.stack.label} {/* trocado — reaproveitando o mesmo label; ajuste se quiser um texto diferente aqui */}
+                {t.stack.label}
               </p>
 
               <p className="mt-1 font-mono text-sm text-gray-400">
-                {t.stack.subtitle} {/* trocado */}
+                {t.stack.subtitle}
               </p>
             </div>
 
@@ -94,53 +232,146 @@ export function TechStack() {
             </div>
           </div>
 
+          {/* CATEGORIAS */}
+          <div className="mb-8 flex flex-wrap justify-center gap-2 sm:justify-start">
+            {categories.map((category) => {
+              const isActive =
+                activeCategory === category.key;
+
+              return (
+                <motion.button
+                  key={category.key}
+                  type="button"
+                  onClick={() =>
+                    setActiveCategory(category.key)
+                  }
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.96 }}
+                  className={`rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.18em] transition-all duration-300 ${
+                    isActive
+                      ? "border-purple-400/50 bg-purple-500/15 text-purple-300 shadow-[0_0_20px_rgba(168,85,247,0.08)]"
+                      : "border-purple-500/10 bg-purple-500/[0.02] text-gray-500 hover:border-purple-400/30 hover:bg-purple-500/[0.06] hover:text-gray-300"
+                  }`}
+                >
+                  {category.label}
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* GRAFICO */}
           <div className="relative h-[440px] w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-purple-500/30">
-            <div className="relative mx-auto h-full min-w-[760px] w-full">
+            <div
+              className={`relative mx-auto h-full min-w-[760px] ${
+                filteredStack.length <= 5
+                  ? "w-full"
+                  : "w-full"
+              }`}
+            >
+              {/* GRID */}
               <div className="absolute inset-0 flex flex-col justify-between pb-[88px] pl-11">
-                {[100, 75, 50, 25, 0].map((value) => (
-                  <motion.div
-                    key={value}
-                    initial={{ opacity: 0, scaleX: 0 }}
-                    whileInView={{ opacity: 1, scaleX: 1 }}
-                    viewport={{ once: false }}
-                    transition={{ duration: 0.7, delay: 0.15 + (100 - value) * 0.002 }}
-                    className="flex origin-left items-center gap-5"
-                  >
-                    <span className="w-7 text-right font-mono text-[10px] text-gray-500">
-                      {value}
-                    </span>
-                    <div className="h-px flex-1 bg-purple-400/[0.12]" />
-                  </motion.div>
-                ))}
+                {[100, 75, 50, 25, 0].map(
+                  (value) => (
+                    <motion.div
+                      key={value}
+                      initial={{
+                        opacity: 0,
+                        scaleX: 0,
+                      }}
+                      whileInView={{
+                        opacity: 1,
+                        scaleX: 1,
+                      }}
+                      viewport={{ once: false }}
+                      transition={{
+                        duration: 0.7,
+                        delay:
+                          0.15 +
+                          (100 - value) * 0.002,
+                      }}
+                      className="flex origin-left items-center gap-5"
+                    >
+                      <span className="w-7 text-right font-mono text-[10px] text-gray-500">
+                        {value}
+                      </span>
+
+                      <div className="h-px flex-1 bg-purple-400/[0.12]" />
+                    </motion.div>
+                  )
+                )}
               </div>
 
+              {/* BARRAS */}
               <div className="absolute inset-0 flex items-end gap-5 pl-[76px] pr-5 pb-[88px] sm:gap-7">
-                {stack.map((tech, index) => {
+                {filteredStack.map((tech, index) => {
                   const Icon = tech.icon;
+
                   return (
                     <motion.div
                       key={tech.name}
-                      variants={itemVariants}
+                      initial={{
+                        opacity: 0,
+                        y: 35,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        y: 0,
+                      }}
+                      transition={{
+                        duration: 0.5,
+                        delay: index * 0.06,
+                      }}
                       className="group flex h-full min-w-[58px] flex-1 flex-col items-center justify-end"
                     >
+                      {/* PORCENTAGEM */}
                       <motion.span
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
+                        initial={{
+                          opacity: 0,
+                          y: 10,
+                        }}
+                        whileInView={{
+                          opacity: 1,
+                          y: 0,
+                        }}
                         viewport={{ once: false }}
-                        transition={{ duration: 0.5, delay: 0.45 + index * 0.08 }}
+                        transition={{
+                          duration: 0.5,
+                          delay:
+                            0.45 +
+                            index * 0.08,
+                        }}
                         className="mb-3 font-mono text-sm font-semibold"
-                        style={{ color: tech.color, textShadow: `0 0 12px ${tech.color}80` }}
+                        style={{
+                          color: tech.color,
+                          textShadow: `0 0 12px ${tech.color}80`,
+                        }}
                       >
                         {tech.level}%
                       </motion.span>
 
+                      {/* BARRA */}
                       <div className="relative h-[320px] w-full max-w-[52px]">
                         <div className="absolute inset-0 rounded-t-xl bg-white/[0.025]" />
+
                         <motion.div
-                          initial={{ height: 0 }}
-                          whileInView={{ height: `${tech.level}%` }}
+                          initial={{
+                            height: 0,
+                          }}
+                          whileInView={{
+                            height: `${tech.level}%`,
+                          }}
                           viewport={{ once: false }}
-                          transition={{ duration: 1.1, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                          transition={{
+                            duration: 1.1,
+                            delay:
+                              index * 0.08,
+                            ease: [
+                              0.22,
+                              1,
+                              0.36,
+                              1,
+                            ],
+                          }}
                           className="absolute bottom-0 w-full overflow-hidden rounded-t-xl"
                           style={{
                             background: `linear-gradient(to top, ${tech.color}55, ${tech.color}90)`,
@@ -149,37 +380,80 @@ export function TechStack() {
                           }}
                         >
                           <motion.div
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            viewport={{ once: false }}
-                            transition={{ duration: 0.5, delay: 0.8 + index * 0.08 }}
+                            initial={{
+                              opacity: 0,
+                            }}
+                            whileInView={{
+                              opacity: 1,
+                            }}
+                            viewport={{
+                              once: false,
+                            }}
+                            transition={{
+                              duration: 0.5,
+                              delay:
+                                0.8 +
+                                index * 0.08,
+                            }}
                             className="absolute left-0 right-0 top-0 h-[2px]"
-                            style={{ background: tech.color, boxShadow: `0 0 14px ${tech.color}` }}
+                            style={{
+                              background:
+                                tech.color,
+                              boxShadow: `0 0 14px ${tech.color}`,
+                            }}
                           />
+
                           <div
                             className="absolute inset-x-0 bottom-0 h-1/2"
-                            style={{ background: `linear-gradient(to top, ${tech.color}60, transparent)` }}
+                            style={{
+                              background: `linear-gradient(to top, ${tech.color}60, transparent)`,
+                            }}
                           />
+
                           <motion.div
-                            animate={{ opacity: [0.15, 0.35, 0.15] }}
-                            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                            animate={{
+                              opacity: [
+                                0.15,
+                                0.35,
+                                0.15,
+                              ],
+                            }}
+                            transition={{
+                              duration: 2.5,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            }}
                             className="absolute inset-x-0 bottom-0 h-1/2"
-                            style={{ background: `linear-gradient(to top, ${tech.color}, transparent)` }}
+                            style={{
+                              background: `linear-gradient(to top, ${tech.color}, transparent)`,
+                            }}
                           />
                         </motion.div>
                       </div>
 
+                      {/* ÍCONE */}
                       <motion.div
-                        whileHover={{ scale: 1.2, y: -3 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                        whileHover={{
+                          scale: 1.2,
+                          y: -3,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 15,
+                        }}
                         className="mt-4 flex h-8 items-center justify-center"
                       >
                         <Icon
                           className="text-2xl transition-all duration-300"
-                          style={{ color: tech.color, filter: `drop-shadow(0 0 6px ${tech.color}40)` }}
+                          style={{
+                            color: tech.color,
+                            filter: `drop-shadow(0 0 6px ${tech.color}40)`,
+                          }}
                         />
                       </motion.div>
 
+                      {/* NOME */}
                       <span className="mt-2 whitespace-nowrap font-mono text-[10px] text-gray-400 transition-colors duration-300 group-hover:text-white">
                         {tech.name}
                       </span>
@@ -190,10 +464,26 @@ export function TechStack() {
             </div>
           </div>
 
-          <motion.div variants={itemVariants} className="mt-4 flex justify-center sm:hidden">
+          {/* HINT MOBILE */}
+          <motion.div
+            variants={itemVariants}
+            className="mt-4 flex items-center justify-center gap-2 sm:hidden"
+          >
+            <ChevronLeft
+              size={14}
+              strokeWidth={1.5}
+              className="text-purple-400/60"
+            />
+
             <span className="font-mono text-[9px] uppercase tracking-widest text-gray-600">
-              ← {t.stack.slideHint ?? "deslize para explorar"} → {/* ver nota abaixo */}
+              {t.stack.slideHint}
             </span>
+
+            <ChevronRight
+              size={14}
+              strokeWidth={1.5}
+              className="text-purple-400/60"
+            />
           </motion.div>
         </motion.div>
       </motion.div>

@@ -5,6 +5,7 @@ import { LoadingScreen } from "@/components/loading/LoadingScreen";
 import { Hero } from "@/components/hero/Hero";
 import { TechStack } from "@/components/stack/TechStack";
 import { ComputerSection } from "@/components/computer/ComputerSection";
+import { MobileNavigation } from "@/components/mobile/MobileNavigation";
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +34,7 @@ export default function Home() {
         <Hero />
         <TechStack />
         <ComputerSection />
+        <MobileNavigation />
       </main>
     </>
   );

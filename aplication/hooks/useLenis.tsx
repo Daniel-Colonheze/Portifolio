@@ -36,8 +36,21 @@ export function LenisProvider({ children }: { children: ReactNode }) {
 // Hook pra QUALQUER componente acessar o Lenis e pausar/retomar
 export function useLenisControls() {
   const ctx = useContext(LenisContext);
+
   return {
     stop: () => ctx?.current?.stop(),
+
     start: () => ctx?.current?.start(),
+
+    scrollTo: (
+      target: string | number | HTMLElement,
+      options?: {
+        duration?: number;
+        offset?: number;
+      }
+    ) => {
+      ctx?.current?.scrollTo(target, options);
+    },
   };
 }
+

@@ -1,0 +1,120 @@
+"use client";
+
+import {
+  FaGithub,
+  FaLinkedinIn,
+  FaEnvelope,
+} from "react-icons/fa";
+import { useLanguage } from "@/i18n/LanguageContext";
+
+export function Footer() {
+  const { t } = useLanguage();
+
+  const links = [
+    { label: t.header.about, href: "/#sobre" },
+    { label: t.header.stack, href: "/#stack" },
+    { label: t.header.projects, href: "/projetos" },
+    { label: t.header.certificates, href: "/#certificados" },
+    { label: t.header.contact, href: "/contato" },
+  ];
+
+  const socialLinks = [
+    {
+      label: "GitHub",
+      href: "https://github.com/Daniel-Colonheze",
+      icon: FaGithub,
+    },
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/daniel-colonheze/",
+      icon: FaLinkedinIn,
+    },
+    {
+      label: "E-mail",
+      href: "mailto:danielcolonhze@gmail.com",
+      icon: FaEnvelope,
+    },
+  ];
+
+  return (
+    <footer className="relative overflow-hidden border-t border-purple-500/10 bg-black px-6 py-12 md:px-16">
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-700/[0.04] blur-[120px]" />
+
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
+          <div className="max-w-md">
+            <a
+              href="/#sobre"
+              className="font-mono text-lg font-semibold tracking-wider text-white transition-colors duration-300 hover:text-purple-200"
+            >
+              Daniel Colonheze
+              <span className="text-purple-400">.</span>
+            </a>
+
+            <p className="mt-4 text-sm leading-7 text-gray-400">
+              {t.footer.description}
+            </p>
+
+            <div className="mt-6 flex items-center gap-3">
+              {socialLinks.map((link) => {
+                const Icon = link.icon;
+
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target={
+                      link.href.startsWith("http")
+                        ? "_blank"
+                        : undefined
+                    }
+                    rel={
+                      link.href.startsWith("http")
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
+                    aria-label={link.label}
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-purple-500/15 bg-purple-500/[0.04] text-gray-400 transition-all duration-300 hover:border-purple-400/40 hover:bg-purple-500/10 hover:text-purple-300"
+                  >
+                    <Icon size={15} />
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.2em] text-purple-400">
+              {t.footer.navigation}
+            </p>
+
+            <nav className="grid grid-cols-2 gap-x-12 gap-y-4">
+              {links.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="w-fit font-mono text-xs text-gray-400 transition-colors duration-300 hover:text-white"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        <div className="my-10 h-px w-full bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+
+        <div className="flex flex-col gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500">
+            © {new Date().getFullYear()} Daniel Colonheze.{" "}
+            {t.footer.rights}
+          </p>
+
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-600">
+            {t.footer.builtWith}
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
