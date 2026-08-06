@@ -38,6 +38,7 @@ export function Computer({ debug = false }) {
 
   const groupRef = useRef<THREE.Group>(null);
   const innerRef = useRef<THREE.Group>(null);
+
   const mouseNodeRef = useRef<THREE.Object3D | null>(null);
   const keyNodesRef = useRef<THREE.Object3D[]>([]);
 
@@ -48,6 +49,13 @@ export function Computer({ debug = false }) {
   const visibleRef = useRef(true);
   const modelScaleRef = useRef(1);
 
+  // ==========================================
+  // ÂNCORA FIXA DA TELA
+  // ==========================================
+
+  const screenAnchorRef =
+    useRef<THREE.Object3D | null>(null);
+
   const [screenAnchor, setScreenAnchor] =
     useState<THREE.Object3D | null>(null);
 
@@ -57,8 +65,11 @@ export function Computer({ debug = false }) {
       t.terminal.help,
     ]);
 
-  const [currentInput, setCurrentInput] = useState("");
-  const [anchorReady, setAnchorReady] = useState(false);
+  const [currentInput, setCurrentInput] =
+    useState("");
+
+  const [anchorReady, setAnchorReady] =
+    useState(false);
 
   // ==========================================
   // CONFIGURAÇÃO DO MODELO
@@ -73,6 +84,7 @@ export function Computer({ debug = false }) {
     inner.scale.set(1, 1, 1);
 
     const box = new THREE.Box3().setFromObject(inner);
+
     const size = new THREE.Vector3();
     const center = new THREE.Vector3();
 
@@ -80,9 +92,11 @@ export function Computer({ debug = false }) {
     box.getCenter(center);
 
     const scale =
-      TARGET_HEIGHT / Math.max(size.y, 0.001);
+      TARGET_HEIGHT /
+      Math.max(size.y, 0.001);
 
     inner.scale.setScalar(scale);
+
     modelScaleRef.current = scale;
 
     inner.position.set(
@@ -124,6 +138,11 @@ export function Computer({ debug = false }) {
   // ==========================================
 
   useEffect(() => {
+    // Evita criar uma segunda âncora
+    if (screenAnchorRef.current) {
+      return;
+    }
+
     const find = (
       predicate: (
         object: THREE.Object3D
@@ -132,7 +151,10 @@ export function Computer({ debug = false }) {
       let found: THREE.Object3D | null = null;
 
       model.traverse((object) => {
-        if (!found && predicate(object)) {
+        if (
+          !found &&
+          predicate(object)
+        ) {
           found = object;
         }
       });
@@ -140,38 +162,60 @@ export function Computer({ debug = false }) {
       return found;
     };
 
-    // Mouse
-    mouseNodeRef.current = find((object) =>
-      /mouse/i.test(object.name)
+    // ==========================================
+    // MOUSE
+    // ==========================================
+
+    mouseNodeRef.current = find(
+      (object) =>
+        /mouse/i.test(object.name)
     );
 
-    // Monitor
-    const monitor = find((object) =>
-      /(screen|tela|monitor|display)/i.test(
-        object.name
-      )
+    // ==========================================
+    // MONITOR
+    // ==========================================
+
+    const monitor = find(
+      (object) =>
+        /(screen|tela|monitor|display)/i.test(
+          object.name
+        )
     );
 
     if (monitor) {
-      monitor.updateWorldMatrix(true, false);
-
-      const box = new THREE.Box3().setFromObject(
-        monitor
+      monitor.updateWorldMatrix(
+        true,
+        false
       );
 
+      const box =
+        new THREE.Box3().setFromObject(
+          monitor
+        );
+
       const size = new THREE.Vector3();
-      const worldCenter = new THREE.Vector3();
+      const worldCenter =
+        new THREE.Vector3();
 
       box.getSize(size);
       box.getCenter(worldCenter);
 
-      const localCenter = monitor.worldToLocal(
-        worldCenter.clone()
+      const localCenter =
+        monitor.worldToLocal(
+          worldCenter.clone()
+        );
+
+      // ==========================================
+      // ÂNCORA DA TELA
+      // POSIÇÃO MANTIDA EXATAMENTE COMO ESTAVA
+      // ==========================================
+
+      const anchor =
+        new THREE.Object3D();
+
+      anchor.position.copy(
+        localCenter
       );
-
-      const anchor = new THREE.Object3D();
-
-      anchor.position.copy(localCenter);
 
       const frontOffset =
         Math.min(
@@ -180,8 +224,9 @@ export function Computer({ debug = false }) {
           size.z
         ) / 2;
 
+      // POSIÇÃO ATUAL — NÃO ALTERAR
       anchor.position.y +=
-        frontOffset * 35;
+        frontOffset * -150;
 
       anchor.position.x -=
         frontOffset * 20;
@@ -189,6 +234,7 @@ export function Computer({ debug = false }) {
       anchor.rotation.y =
         Math.PI / -2;
 
+      // Mantém a escala correta
       const compensScale =
         1 / modelScaleRef.current;
 
@@ -196,7 +242,14 @@ export function Computer({ debug = false }) {
         compensScale
       );
 
+      // ==========================================
+      // FIXA A ÂNCORA NO MONITOR
+      // ==========================================
+
       monitor.add(anchor);
+
+      screenAnchorRef.current =
+        anchor;
 
       setScreenAnchor(anchor);
       setAnchorReady(true);
@@ -213,6 +266,11 @@ export function Computer({ debug = false }) {
         );
 
         console.log(
+          "[Computer] posição fixa da tela:",
+          anchor.position
+        );
+
+        console.log(
           "[Computer] escala da âncora:",
           compensScale
         );
@@ -223,7 +281,10 @@ export function Computer({ debug = false }) {
       );
     }
 
-    // Teclado
+    // ==========================================
+    // TECLADO
+    // ==========================================
+
     const keys: THREE.Object3D[] = [];
 
     const teclado = find(
@@ -256,6 +317,23 @@ export function Computer({ debug = false }) {
         keys.length
       );
     }
+
+    // ==========================================
+    // LIMPEZA
+    // ==========================================
+
+    return () => {
+      if (
+        screenAnchorRef.current &&
+        screenAnchorRef.current.parent
+      ) {
+        screenAnchorRef.current.parent.remove(
+          screenAnchorRef.current
+        );
+      }
+
+      screenAnchorRef.current = null;
+    };
   }, [model, debug]);
 
   // ==========================================
@@ -377,7 +455,10 @@ export function Computer({ debug = false }) {
         return;
       }
 
-      if (event.key === "Backspace") {
+      if (
+        event.key ===
+        "Backspace"
+      ) {
         setCurrentInput(
           (previous) =>
             previous.slice(0, -1)
@@ -407,7 +488,7 @@ export function Computer({ debug = false }) {
   }, [currentInput]);
 
   // ==========================================
-  // ANIMAÇÃO DO TECLADO + CABO DO MOUSE
+  // ANIMAÇÃO DO TECLADO + CABO
   // ==========================================
 
   useFrame(() => {
@@ -426,7 +507,8 @@ export function Computer({ debug = false }) {
             -Math.sin(
               (elapsed / duration) *
                 Math.PI
-            ) * 0.5;
+            ) *
+            0.5;
         } else {
           key.position.y = 0;
 
@@ -439,8 +521,7 @@ export function Computer({ debug = false }) {
 
     if (mouseNodeRef.current) {
       const mousePosition =
-        mouseNodeRef.current
-          .position;
+        mouseNodeRef.current.position;
 
       const anchor =
         cableAnchorRef.current;
@@ -470,9 +551,7 @@ export function Computer({ debug = false }) {
           anchor.y,
           anchor.z,
         ],
-
         midPoint,
-
         [
           mousePosition.x,
           0,
@@ -496,10 +575,7 @@ export function Computer({ debug = false }) {
 
     if (!trimmed) return;
 
-    // ==========================================
     // SOBRE
-    // ==========================================
-
     if (
       trimmed === "about" ||
       trimmed === "sobre"
@@ -520,10 +596,7 @@ export function Computer({ debug = false }) {
       return;
     }
 
-    // ==========================================
     // STACK
-    // ==========================================
-
     if (
       trimmed === "stack" ||
       trimmed === "tecnologias"
@@ -544,10 +617,7 @@ export function Computer({ debug = false }) {
       return;
     }
 
-    // ==========================================
     // PROJETOS
-    // ==========================================
-
     if (
       trimmed === "projects" ||
       trimmed === "projetos"
@@ -561,17 +631,12 @@ export function Computer({ debug = false }) {
         ]
       );
 
-      router.push(
-        "/projetos"
-      );
+      router.push("/projetos");
 
       return;
     }
 
-    // ==========================================
     // CONTATO
-    // ==========================================
-
     if (
       trimmed === "contact" ||
       trimmed === "contato"
@@ -585,20 +650,13 @@ export function Computer({ debug = false }) {
         ]
       );
 
-      router.push(
-        "/contato"
-      );
+      router.push("/contato");
 
       return;
     }
 
-    // ==========================================
     // GITHUB
-    // ==========================================
-
-    if (
-      trimmed === "github"
-    ) {
+    if (trimmed === "github") {
       window.open(
         "https://github.com/Daniel-Colonheze",
         "_blank"
@@ -616,13 +674,8 @@ export function Computer({ debug = false }) {
       return;
     }
 
-    // ==========================================
     // LINKEDIN
-    // ==========================================
-
-    if (
-      trimmed === "linkedin"
-    ) {
+    if (trimmed === "linkedin") {
       window.open(
         "https://www.linkedin.com/in/daniel-colonheze/",
         "_blank"
@@ -640,17 +693,10 @@ export function Computer({ debug = false }) {
       return;
     }
 
-    // ==========================================
     // COMANDOS INTERNOS
-    // ==========================================
-
     let output = "";
 
     switch (trimmed) {
-      // ----------------------------------------
-      // HELP
-      // ----------------------------------------
-
       case "help":
         output =
           `${t.terminal.commands.title}\n` +
@@ -666,10 +712,6 @@ export function Computer({ debug = false }) {
 
         break;
 
-      // ----------------------------------------
-      // CURIOSIDADES
-      // ----------------------------------------
-
       case "curiosidades":
       case "curiosities":
         output =
@@ -677,17 +719,9 @@ export function Computer({ debug = false }) {
 
         break;
 
-      // ----------------------------------------
-      // CLEAR
-      // ----------------------------------------
-
       case "clear":
         setTerminalHistory([]);
         return;
-
-      // ----------------------------------------
-      // COMANDO NÃO ENCONTRADO
-      // ----------------------------------------
 
       default:
         output =

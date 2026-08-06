@@ -28,7 +28,10 @@ export function Header() {
       label: t.header.computer,
       href: "#computador",
     },
-    { label: t.header.contact, href: "/contato" },
+    {
+      label: t.header.contact,
+      href: "/contato",
+    },
   ];
 
   const handleNavigation = (href: string) => {
@@ -80,7 +83,7 @@ export function Header() {
         duration: 0.6,
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="absolute left-0 right-0 top-0 z-50 px-4 pt-5 md:px-8 md:pt-6"
+      className="fixed inset-x-0 top-0 z-20 px-4 pt-5 md:px-8 md:pt-6"
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-purple-500/10 bg-black/60 px-5 shadow-[0_0_30px_rgba(168,85,247,0.04)] backdrop-blur-xl md:px-7">
 
