@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { FaGithub } from "react-icons/fa";
 import { projects } from "@/data/projects";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -49,6 +50,7 @@ export function ProjectCard({
         <div className="absolute inset-0 rounded-2xl shadow-[inset_0_0_40px_rgba(168,85,247,0.04)]" />
       </div>
 
+      {/* Header */}
       <div className="relative z-10 flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-purple-400/60">
           {t.projects.projectLabel}{" "}
@@ -60,6 +62,7 @@ export function ProjectCard({
         </span>
       </div>
 
+      {/* Project image */}
       <div className="relative z-10 mt-6 overflow-hidden rounded-xl border border-purple-500/10 bg-black/40">
         <div className="relative aspect-video w-full overflow-hidden">
           {project.image ? (
@@ -80,10 +83,11 @@ export function ProjectCard({
 
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-purple-500/[0.03]" />
 
-          <div className="pointer-events-none absolute inset-0 border border-purple-400/0 rounded-xl transition-colors duration-500 group-hover:border-purple-400/20" />
+          <div className="pointer-events-none absolute inset-0 rounded-xl border border-purple-400/0 transition-colors duration-500 group-hover:border-purple-400/20" />
         </div>
       </div>
 
+      {/* Project information */}
       <div className="relative z-10 mt-7">
         <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-purple-400/15 bg-purple-500/[0.05] text-purple-400 transition-all duration-300 group-hover:border-purple-400/30 group-hover:bg-purple-500/10 group-hover:shadow-[0_0_25px_rgba(168,85,247,0.12)]">
           <span className="font-mono text-lg">
@@ -101,6 +105,7 @@ export function ProjectCard({
         </p>
       </div>
 
+      {/* Technologies */}
       <div className="relative z-10 mt-7">
         <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.25em] text-gray-100">
           {t.projects.technologies}
@@ -118,7 +123,9 @@ export function ProjectCard({
         </div>
       </div>
 
-      <div className="relative z-10 mt-auto pt-8">
+      {/* Links */}
+      <div className="relative z-10 mt-auto flex items-center gap-8 pt-8">
+        {/* Project */}
         {project.link ? (
           <motion.a
             href={project.link}
@@ -138,8 +145,27 @@ export function ProjectCard({
             {t.projects.privateProject}
           </span>
         )}
+
+        {/* GitHub repository */}
+        {project.repository && (
+          <motion.a
+            href={project.repository}
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ x: 3 }}
+            className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.15em] text-gray-500 transition-colors duration-300 hover:text-white"
+            aria-label="Código no GitHub"
+          >
+            <FaGithub className="h-4 w-4" />
+
+            <span>
+              Código
+            </span>
+          </motion.a>
+        )}
       </div>
 
+      {/* Bottom line */}
       <div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-purple-500 to-transparent transition-all duration-500 group-hover:w-full" />
     </motion.article>
   );

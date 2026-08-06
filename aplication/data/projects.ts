@@ -23,8 +23,8 @@ export const projects = [
       en: "CidadeViva",
     },
     description: {
-      pt: "Sistema (em desenvolvimento) de mapeamento colaborativo de problemas urbanos. O cidadão reporta com foto e localização precisa; o gestor visualiza tudo em um dashboard com filtros por categoria, status e período. Arquitetura separada em frontend (Next.js), API REST (NestJS) e banco geoespacial (PostgreSQL + PostGIS), com deploy na nuvem e armazenamento de imagens via R2.",
-      en: "A system (currently in development) for collaborative mapping of urban problems. Citizens can submit reports with photos and precise locations, while managers can monitor everything through a dashboard with filters by category, status, and date range. The architecture is separated into a frontend (Next.js), REST API (NestJS), and geospatial database (PostgreSQL + PostGIS), with cloud deployment and image storage through R2.",
+      pt: "Sistema (em desenvolvimento) de mapeamento colaborativo de problemas urbanos. O cidadão reporta com foto e localização precisa; o gestor visualiza tudo em um dashboard com filtros por categoria, status e período. Arquitetura separada em frontend (Next.js), API REST (NestJS) e banco geoespacial (PostgreSQL + PostGIS), com deploy a decidir ainda (como sera uma simulação, será um deploy simples de início).",
+      en: "System (under development) for collaborative mapping of urban issues. Citizens can submit reports with photos and precise locations, while administrators can view everything through a dashboard with filters by category, status, and time period. The architecture is separated into a frontend (Next.js), REST API (NestJS), and geospatial database (PostgreSQL + PostGIS). Deployment is yet to be decided; since this is a simulation, a simple deployment will be used initially.",
     },
     tags: [
       "Next.js",
@@ -57,7 +57,7 @@ export const projects = [
       "Three.js",
     ],
     image: "/images/projects/portfolio.png",
-    link: "",
+    link: "#",
     repository: "https://github.com/Daniel-Colonheze/Portifolio",
   },
 ];

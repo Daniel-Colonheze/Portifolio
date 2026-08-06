@@ -7,6 +7,7 @@ export const translations = {
         "Estudante do terceiro período de Engenharia de Software na Universidade Tecnológica Federal do Paraná, com experiência prática em desenvolvimento web, focado em frontend e integração com APIs. \n\nTrabalho com React, Next.js, Nest.js e Node.js construindo interfaces responsivas e sistemas completos, do zero à produção. \n\nTambém possuo conhecimento em áreas como cloud (AWS) e banco de dados (PostgreSQL, MySQL), além de experiência com metodologias ágeis e possuir uma boa comunicação. \n\nAtualmente estou aprofundando meus conhecimentos em fullstack estudando NestJS, AWS e arquitetura de software.",
       explore: "↓ role para explorar",
     },
+
     certifications: {
       label: "04 / CERTIFICAÇÕES",
       title: "Certificações & Badges",
@@ -17,11 +18,13 @@ export const translations = {
       viewCertificate: "Ver certificado",
       viewBadge: "Ver badge",
     },
+
     header: {
       about: "Sobre",
       stack: "Stack",
       projects: "Projetos",
       certificates: "Certificações",
+      computer: "Computador",
       contact: "Contato",
     },
 
@@ -41,9 +44,9 @@ export const translations = {
 
     computer: {
       label: "COMPUTADOR INTERATIVO",
-      title: "Explore o computador",
+      title: "Forma interativa de explorar meu portfólio",
       description:
-        "Digite os comando 'help' para aparecer as opções para acessar os projetos e contato. O zoom funciona apenas dentro da animação do Three.js, então se você quiser subir de volta use a barra lateral. Arraste para rotacionar o computador, use o scroll para aproximar ou afastar e interaja com os elementos da tela para explorar meu portfólio.",
+        "Digite o comando 'help' para visualizar as opções disponíveis para acessar os projetos e contato. O zoom funciona apenas dentro da animação do Three.js, então, se quiser subir de volta, use a barra lateral. Arraste para rotacionar o computador, use o scroll para aproximar ou afastar e interaja com os elementos da tela para explorar meu portfólio.",
       drag: "Arrastar",
       scroll: "Scroll",
       interact: "Interagir",
@@ -101,10 +104,17 @@ export const translations = {
       system: "DANIEL OS v1.0 // SISTEMA INTERATIVO",
       systemLoaded: "Sistema Operacional v1.0.0 carregado.",
       help: "Digite 'help' para listar os comandos disponíveis.",
+
       aboutText:
         "Gosto de desenvolver utilizando ideias criativas e inovadoras, dessa forma montando sistemas completos e interativos. Para mim, desenvolver é um processo constante de aprender, experimentar e evoluir. É isso que torna cada projeto uma oportunidade de fazer algo melhor do que o anterior.",
+
+      curiosidadesTitle: "CURIOSIDADES SOBRE MIM:",
+
+      curiosidadesText:
+        "Tenho 19 anos, amo futebol e programação. Minhas comidas preferidas são pizza e lasanha. Tenho interesse nas áreas de Fullstack Development, Cloud (AWS) e Cybersecurity.",
+
       commands: {
-        title: "COMANDOS DISPONIVEIS:",
+        title: "COMANDOS DISPONÍVEIS:",
         help: "exibe esta lista de comandos",
         about: "navega para a seção Sobre",
         stack: "navega para a seção Stack",
@@ -112,8 +122,10 @@ export const translations = {
         contact: "navega para a página de Contato",
         github: "abre o perfil no GitHub",
         linkedin: "abre o perfil no LinkedIn",
+        curiosidades: "exibe algumas curiosidades sobre Daniel",
         clear: "limpa a tela do terminal",
       },
+
       messages: {
         openingAbout: "Navegando para Sobre...",
         openingStack: "Navegando para Stack...",
@@ -132,7 +144,7 @@ export const translations = {
       greeting: "// HELLO, I'M",
       role: "Fullstack Developer",
       description:
-        "Third-semester Software Engineering student at the Federal University of Technology – Paraná, with practical experience in web development, focused on frontend development and API integration.\n\nI work with React, Next.js, Nest.js, and Node.js, building responsive interfaces and complete systems from scratch to production. I also have knowledge of cloud computing (AWS) and databases (PostgreSQL, MySQL), along with experience with agile methodologies and strong communication skills.\n\nCurrently, I am deepening my knowledge of fullstack development, studying NestJS, AWS, and software architecture.",
+        "Third-semester Software Engineering student at the Federal University of Technology – Paraná, with practical experience in web development, focused on frontend development and API integration.\n\nI work with React, Next.js, Nest.js, and Node.js, building responsive interfaces and complete systems from scratch to production.\n\nI also have knowledge of cloud computing (AWS) and databases (PostgreSQL, MySQL), along with experience with agile methodologies and strong communication skills.\n\nCurrently, I am deepening my knowledge of fullstack development, studying NestJS, AWS, and software architecture.",
       explore: "↓ scroll to explore",
     },
 
@@ -141,6 +153,7 @@ export const translations = {
       stack: "Stack",
       projects: "Projects",
       certificates: "Certificates",
+      computer: "Computer",
       contact: "Contact",
     },
 
@@ -154,6 +167,7 @@ export const translations = {
       viewCertificate: "View certificate",
       viewBadge: "View badge",
     },
+
     stack: {
       label: "TECHNICAL STACK",
       title: "Technologies & Knowledge",
@@ -170,7 +184,7 @@ export const translations = {
 
     computer: {
       label: "INTERACTIVE COMPUTER",
-      title: "Explore the computer",
+      title: "Interactive way to explore my portfolio",
       description:
         "Type 'help' to see the available commands to access projects and contact. The zoom works only within the Three.js animation, so if you want to go back up, use the sidebar. Drag to rotate the computer, use the scroll wheel to zoom in or out, and interact with the elements on the screen to explore my portfolio.",
       drag: "Drag",
@@ -230,8 +244,15 @@ export const translations = {
       system: "DANIEL OS v1.0 // INTERACTIVE SYSTEM",
       systemLoaded: "Operating System v1.0.0 loaded.",
       help: "Type 'help' to list available commands.",
+
       aboutText:
         "I enjoy developing using creative and innovative ideas, building complete and interactive systems. For me, development is a constant process of learning, experimenting, and evolving. That's what makes every project an opportunity to create something better than the last.",
+
+      curiosidadesTitle: "FUN FACTS ABOUT ME:",
+
+      curiosidadesText:
+        "I'm 19 years old and I love soccer and programming. My favorite foods are pizza and lasagna. I'm interested in Fullstack Development, Cloud (AWS), and Cybersecurity.",
+
       commands: {
         title: "AVAILABLE COMMANDS:",
         help: "display this list of commands",
@@ -241,8 +262,10 @@ export const translations = {
         contact: "navigate to the Contact page",
         github: "open GitHub profile",
         linkedin: "open LinkedIn profile",
+        curiosidades: "display some facts about Daniel",
         clear: "clear the terminal",
       },
+
       messages: {
         openingAbout: "Navigating to About...",
         openingStack: "Navigating to Stack...",

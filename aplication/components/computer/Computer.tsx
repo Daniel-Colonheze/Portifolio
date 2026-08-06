@@ -38,6 +38,7 @@ export function Computer({ debug = false }) {
   const innerRef = useRef<THREE.Group>(null);
   const mouseNodeRef = useRef<THREE.Object3D | null>(null);
   const keyNodesRef = useRef<THREE.Object3D[]>([]);
+
   const activeKeys = useRef(
     new Map<THREE.Object3D, number>()
   );
@@ -48,15 +49,18 @@ export function Computer({ debug = false }) {
   const [screenAnchor, setScreenAnchor] =
     useState<THREE.Object3D | null>(null);
 
-  const [terminalHistory, setTerminalHistory] = useState<
-    string[]
-  >([
-    t.terminal.systemLoaded,
-    t.terminal.help,
-  ]);
+  const [terminalHistory, setTerminalHistory] =
+    useState<string[]>([
+      t.terminal.systemLoaded,
+      t.terminal.help,
+    ]);
 
   const [currentInput, setCurrentInput] = useState("");
   const [anchorReady, setAnchorReady] = useState(false);
+
+  // ==========================================
+  // CONFIGURAÇÃO DO MODELO
+  // ==========================================
 
   useLayoutEffect(() => {
     const inner = innerRef.current;
@@ -113,6 +117,10 @@ export function Computer({ debug = false }) {
     }
   }, [model, debug]);
 
+  // ==========================================
+  // ENCONTRA MONITOR, MOUSE E TECLAS
+  // ==========================================
+
   useEffect(() => {
     const find = (
       predicate: (
@@ -130,10 +138,12 @@ export function Computer({ debug = false }) {
       return found;
     };
 
+    // Mouse
     mouseNodeRef.current = find((object) =>
       /mouse/i.test(object.name)
     );
 
+    // Monitor
     const monitor = find((object) =>
       /(screen|tela|monitor|display)/i.test(
         object.name
@@ -211,6 +221,7 @@ export function Computer({ debug = false }) {
       );
     }
 
+    // Teclado
     const keys: THREE.Object3D[] = [];
 
     const teclado = find(
@@ -245,6 +256,10 @@ export function Computer({ debug = false }) {
     }
   }, [model, debug]);
 
+  // ==========================================
+  // DETECTA SE O COMPUTADOR ESTÁ VISÍVEL
+  // ==========================================
+
   useEffect(() => {
     const element =
       document.getElementById(
@@ -269,6 +284,10 @@ export function Computer({ debug = false }) {
     return () =>
       observer.disconnect();
   }, []);
+
+  // ==========================================
+  // MOVIMENTO DO MOUSE 3D
+  // ==========================================
 
   useEffect(() => {
     const handleMouseMove = (
@@ -317,6 +336,10 @@ export function Computer({ debug = false }) {
         handleMouseMove
       );
   }, []);
+
+  // ==========================================
+  // TECLADO FÍSICO
+  // ==========================================
 
   useEffect(() => {
     const handleKeyDown = (
@@ -380,6 +403,10 @@ export function Computer({ debug = false }) {
         handleKeyDown
       );
   }, [currentInput]);
+
+  // ==========================================
+  // ANIMAÇÃO DO TECLADO + CABO DO MOUSE
+  // ==========================================
 
   useFrame(() => {
     const now =
@@ -452,6 +479,10 @@ export function Computer({ debug = false }) {
       ]);
     }
   });
+
+  // ==========================================
+  // TERMINAL / COMANDOS
+  // ==========================================
 
   const executeCommand = (
     command: string
@@ -614,23 +645,47 @@ export function Computer({ debug = false }) {
     let output = "";
 
     switch (trimmed) {
+      // ----------------------------------------
+      // HELP
+      // ----------------------------------------
+
       case "help":
         output =
           `${t.terminal.commands.title}\n` +
-          `  help      - ${t.terminal.commands.help}\n` +
-          `  about     - ${t.terminal.commands.about}\n` +
-          `  stack     - ${t.terminal.commands.stack}\n` +
-          `  projects  - ${t.terminal.commands.projects}\n` +
-          `  contact   - ${t.terminal.commands.contact}\n` +
-          `  github    - ${t.terminal.commands.github}\n` +
-          `  linkedin  - ${t.terminal.commands.linkedin}\n` +
-          `  clear     - ${t.terminal.commands.clear}`;
+          `  help          - ${t.terminal.commands.help}\n` +
+          `  about         - ${t.terminal.commands.about}\n` +
+          `  stack         - ${t.terminal.commands.stack}\n` +
+          `  projects      - ${t.terminal.commands.projects}\n` +
+          `  contact       - ${t.terminal.commands.contact}\n` +
+          `  github        - ${t.terminal.commands.github}\n` +
+          `  linkedin      - ${t.terminal.commands.linkedin}\n` +
+          `  curiosidades  - ${t.terminal.commands.curiosidades}\n` +
+          `  clear         - ${t.terminal.commands.clear}`;
 
         break;
+
+      // ----------------------------------------
+      // CURIOSIDADES
+      // ----------------------------------------
+
+      case "curiosidades":
+      case "curiosities":
+        output =
+          t.terminal.curiosidadesText;
+
+        break;
+
+      // ----------------------------------------
+      // CLEAR
+      // ----------------------------------------
 
       case "clear":
         setTerminalHistory([]);
         return;
+
+      // ----------------------------------------
+      // COMANDO NÃO ENCONTRADO
+      // ----------------------------------------
 
       default:
         output =
@@ -649,6 +704,10 @@ export function Computer({ debug = false }) {
       ]
     );
   };
+
+  // ==========================================
+  // CONTEÚDO DA TELA
+  // ==========================================
 
   const screenContent = (
     <div className="flex h-full flex-col">
@@ -684,6 +743,10 @@ export function Computer({ debug = false }) {
       </div>
     </div>
   );
+
+  // ==========================================
+  // RENDER
+  // ==========================================
 
   return (
     <group
