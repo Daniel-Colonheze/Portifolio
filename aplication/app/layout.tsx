@@ -1,7 +1,6 @@
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { LanguageProvider } from "@/i18n/LanguageContext";
-import { Header } from "@/components/header/Header";
 import { Footer } from "@/components/footer/Footer";
 import "./globals.css";
 
@@ -32,18 +31,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
       >
         <LanguageProvider>
-        
-
-          <SmoothScroll>  
-            <Header />
-              {children}
+          <SmoothScroll>
+            {children}
             <Footer />
           </SmoothScroll>
-
-          
         </LanguageProvider>
       </body>
     </html>
   );
 }
-
