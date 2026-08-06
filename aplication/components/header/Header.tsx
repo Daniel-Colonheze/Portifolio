@@ -18,20 +18,18 @@ export function Header() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const handleIntroComplete = () => {
+    const handleLoad = () => {
       setIsLoaded(true);
     };
 
-    window.addEventListener(
-      "intro-animation-complete",
-      handleIntroComplete
-    );
+    if (document.readyState === "complete") {
+      setIsLoaded(true);
+    } else {
+      window.addEventListener("load", handleLoad);
+    }
 
     return () => {
-      window.removeEventListener(
-        "intro-animation-complete",
-        handleIntroComplete
-      );
+      window.removeEventListener("load", handleLoad);
     };
   }, []);
 
@@ -104,6 +102,7 @@ export function Header() {
           className="fixed left-0 right-0 top-0 z-[100] px-4 pt-4 md:px-8"
         >
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-purple-500/10 bg-black/60 px-5 shadow-[0_0_30px_rgba(168,85,247,0.04)] backdrop-blur-xl md:px-7">
+            {/* Logo */}
             <button
               type="button"
               onClick={handleLogo}
@@ -115,6 +114,7 @@ export function Header() {
               </span>
             </button>
 
+            {/* Desktop navigation */}
             <nav className="hidden items-center gap-7 md:flex">
               {links.map((link) => (
                 <button
@@ -132,10 +132,12 @@ export function Header() {
               ))}
             </nav>
 
+            {/* Desktop language */}
             <div className="hidden items-center md:flex">
               <LanguageSwitcher />
             </div>
 
+            {/* Mobile actions */}
             <div className="flex items-center gap-3 md:hidden">
               <LanguageSwitcher />
 
@@ -160,6 +162,7 @@ export function Header() {
             </div>
           </div>
 
+          {/* Mobile menu */}
           <AnimatePresence>
             {isOpen && (
               <motion.div
@@ -189,7 +192,9 @@ export function Header() {
                       key={link.href}
                       type="button"
                       onClick={() =>
-                        handleNavigation(link.href)
+                        handleNavigation(
+                          link.href
+                        )
                       }
                       className="flex items-center justify-between rounded-xl px-4 py-4 text-left font-mono text-xs uppercase tracking-[0.18em] text-gray-400 transition-colors hover:bg-purple-500/[0.06] hover:text-white"
                     >

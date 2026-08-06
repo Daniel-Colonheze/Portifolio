@@ -24,11 +24,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
       },
     });
 
-    tl.set(".reveal-shape", {
-      opacity: 0,
-      scale: 0,
-      transformOrigin: "center",
-    })
+    // Primeiro SVG (geométrico)
+    tl.set(".reveal-shape", { opacity: 0, scale: 0, transformOrigin: "center" })
       .to(shapes[0] as gsap.TweenTarget, {
         opacity: 1,
         scale: 1,
@@ -53,25 +50,23 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         duration: 0.8,
         ease: "power2.in",
       })
-      .set(".first-svg", {
-        display: "none",
-      })
-      .set(".second-svg", {
-        opacity: 1,
-      })
+      .set(".first-svg", { display: "none" })
+
+// Segundo SVG entra
+      .set(".second-svg", { opacity: 1 })
       .set(secondPathRef.current, {
         strokeWidth: 10,
-        strokeDasharray:
-          secondPathRef.current?.getTotalLength() || 0,
-        strokeDashoffset:
-          secondPathRef.current?.getTotalLength() || 0,
+        strokeDasharray: secondPathRef.current?.getTotalLength() || 0,
+        strokeDashoffset: secondPathRef.current?.getTotalLength() || 0,
       })
-      .to(secondPathRef.current, {
+      // Etapa 1: desenha o traço fino
+.to(secondPathRef.current, {
         strokeWidth: 300,
         strokeDashoffset: 0,
         duration: 4,
         ease: "sine.inOut",
       })
+      // Camada de segurança: cobre 100% da tela exatamente quando o traço termina de engrossar
       .to(
         coverRef.current,
         {
@@ -81,7 +76,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         },
         "-=0.3"
       )
-      .to({}, { duration: 0.6 })
+      .to({}, { duration: 0.6 }) // segura a tela cheia de roxo por um instante
       .to(containerRef.current, {
         opacity: 0,
         duration: 0.8,
@@ -97,13 +92,14 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black px-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black px-6 overflow-hidden"
     >
+      {/* Primeiro SVG (geométrico) */}
       <svg
         viewBox="0 0 311 285"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="first-svg h-auto w-full max-w-[280px] sm:max-w-[340px] md:max-w-[400px]"
+        className="first-svg w-full max-w-[280px] sm:max-w-[340px] md:max-w-[400px] h-auto"
       >
         <g className="reveal-shape">
           <path
@@ -116,7 +112,6 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
             fillOpacity="0.2"
           />
         </g>
-
         <g className="reveal-shape">
           <path
             d="M43 63C29.5817 60.1219 24.6514 55.6686 22 41C19.5596 55.7426 15.6543 61.4712 0 63C13.1616 64.7998 18.7073 68.5337 22 85C24.4458 72.2013 28.428 66.9342 43 63Z"
@@ -128,7 +123,6 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
             fillOpacity="0.2"
           />
         </g>
-
         <g className="reveal-shape">
           <path
             d="M65.5 86.5C59.2274 83.7659 57.2342 81.2745 55 76C53.277 82.8336 50.5701 84.8155 44 86.5C50.3685 87.5458 53.1173 89.3429 55 97C56.5468 90.7767 58.6755 88.3362 65.5 86.5Z"
@@ -140,7 +134,6 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
             fillOpacity="0.2"
           />
         </g>
-
         <g className="reveal-shape">
           <path
             d="M45 108C39.2036 105.84 37.7136 103.608 37 98.5C35.2349 104.884 33.1543 106.795 28 108C34.3898 109.479 35.8794 111.932 37 117.5C38.272 110.723 40.3648 109.208 45 108Z"
@@ -152,64 +145,32 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
             fillOpacity="0.2"
           />
         </g>
-
         <defs>
-          <linearGradient
-            id="paint0_linear_8_261"
-            x1="177.756"
-            y1="0"
-            x2="177.756"
-            y2="284.286"
-            gradientUnits="userSpaceOnUse"
-          >
+          <linearGradient id="paint0_linear_8_261" x1="177.756" y1="0" x2="177.756" y2="284.286" gradientUnits="userSpaceOnUse">
             <stop stopColor="#CB30E0" />
             <stop offset="0.980769" stopColor="#8B5CF6" />
           </linearGradient>
-
-          <linearGradient
-            id="paint1_linear_8_261"
-            x1="32.75"
-            y1="41"
-            x2="32.75"
-            y2="117.5"
-            gradientUnits="userSpaceOnUse"
-          >
+          <linearGradient id="paint1_linear_8_261" x1="32.75" y1="41" x2="32.75" y2="117.5" gradientUnits="userSpaceOnUse">
             <stop stopColor="#A920C5" />
             <stop offset="0.978828" stopColor="#2C20A9" stopOpacity="0" />
           </linearGradient>
-
-          <linearGradient
-            id="paint2_linear_8_261"
-            x1="32.75"
-            y1="41"
-            x2="32.75"
-            y2="117.5"
-            gradientUnits="userSpaceOnUse"
-          >
+          <linearGradient id="paint2_linear_8_261" x1="32.75" y1="41" x2="32.75" y2="117.5" gradientUnits="userSpaceOnUse">
             <stop stopColor="#A920C5" />
             <stop offset="0.978828" stopColor="#2C20A9" stopOpacity="0" />
           </linearGradient>
-
-          <linearGradient
-            id="paint3_linear_8_261"
-            x1="32.75"
-            y1="41"
-            x2="32.75"
-            y2="117.5"
-            gradientUnits="userSpaceOnUse"
-          >
+          <linearGradient id="paint3_linear_8_261" x1="32.75" y1="41" x2="32.75" y2="117.5" gradientUnits="userSpaceOnUse">
             <stop stopColor="#A920C5" />
-            <stop offset="0.978828" stopColor="#2C20A9" stopOpacity="0"
-            />
+            <stop offset="0.978828" stopColor="#2C20A9" stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
 
+      {/* Segundo SVG - traço contínuo que engrossa */}
       <svg
         viewBox="0 0 1004 458"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="second-svg absolute inset-0 h-full w-full"
+        className="second-svg absolute inset-0 w-full h-full"
         style={{ opacity: 0 }}
         preserveAspectRatio="xMidYMid slice"
       >
@@ -223,6 +184,7 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         />
       </svg>
 
+      {/* Camada de segurança: garante 100% de cobertura antes de revelar a página */}
       <div
         ref={coverRef}
         className="absolute inset-0 bg-[#9634FB]"

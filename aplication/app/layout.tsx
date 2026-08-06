@@ -1,47 +1,30 @@
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
-import { SmoothScroll } from "@/components/layout/SmoothScroll";
-import { LanguageProvider } from "@/i18n/LanguageContext";
-import { Footer } from "@/components/footer/Footer";
-import { PageTransition } from "@/components/layout/PageTransition";
-import "./globals.css";
+"use client";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import { useState } from "react";
+import { LoadingScreen } from "@/components/loading/LoadingScreen";
+import { Header } from "@/components/header/Header";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-});
-
-export default function RootLayout({
-  children,
-}: {
+interface PageTransitionProps {
   children: React.ReactNode;
-}) {
-  return (
-    <html lang="pt-BR">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable}`}
-      >
-        <LanguageProvider>
-          <SmoothScroll>
-            <PageTransition>
-              {children}
-            </PageTransition>
+}
 
-            <Footer />
-          </SmoothScroll>
-        </LanguageProvider>
-      </body>
-    </html>
+export function PageTransition({
+  children,
+}: PageTransitionProps) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <>
+      {isLoading && (
+        <LoadingScreen
+          onComplete={() => setIsLoading(false)}
+        />
+      )}
+
+      {!isLoading && <Header />}
+
+      {children}
+    </>
   );
 }
 
