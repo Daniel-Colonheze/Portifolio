@@ -4,13 +4,15 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useGLTF, Html, Line } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/i18n/LanguageContext";
 import * as THREE from "three";
 
 const TARGET_HEIGHT = 2.2;
 
+
 export function Computer({ debug = false }) {
   const router = useRouter();
-
+  const { t } = useLanguage();
   const cableAnchorRef = useRef(new THREE.Vector3(0.3, 0.05, -0.4));
   const [cablePoints, setCablePoints] = useState([
     [0, 0, 0],
@@ -33,8 +35,8 @@ export function Computer({ debug = false }) {
     useState<THREE.Object3D | null>(null);
 
   const [terminalHistory, setTerminalHistory] = useState<string[]>([
-    "Sistema Operacional v1.0.0 carregado.",
-    "Digite 'help' para listar os comandos disponíveis.",
+    t.terminal.systemLoaded,
+    t.terminal.help,
   ]);
 
   const [currentInput, setCurrentInput] = useState("");
@@ -333,111 +335,69 @@ export function Computer({ debug = false }) {
     }
   });
 
-  const executeCommand = (command: string) => {
-    const trimmed = command.trim().toLowerCase();
+const executeCommand = (command: string) => {
+  const trimmed = command.trim().toLowerCase();
+  if (!trimmed) return;
 
-    if (!trimmed) return;
+  if (trimmed === "projects" || trimmed === "projetos") {
+    setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingProjects]);
+    router.push("/projetos");
+    return;
+  }
 
-    if (
-      trimmed === "projects" ||
-      trimmed === "projetos"
-    ) {
-      setTerminalHistory((previous) => [
-        ...previous,
-        `$ ${command}`,
-        "Abrindo projetos...",
-      ]);
+  if (trimmed === "contact" || trimmed === "contato") {
+    setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingContact]);
+    router.push("/contato");
+    return;
+  }
 
-      router.push("/projetos");
+  if (trimmed === "github") {
+    window.open("https://github.com/Daniel-Colonheze", "_blank");
+    setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingGithub]);
+    return;
+  }
+
+  if (trimmed === "linkedin") {
+    window.open("https://www.linkedin.com/in/daniel-colonheze/", "_blank");
+    setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingLinkedin]);
+    return;
+  }
+
+  let output = "";
+
+  switch (trimmed) {
+    case "help":
+      output =
+        `${t.terminal.commands.title}\n` +
+        `  help      - ${t.terminal.commands.help}\n` +
+        `  about     - ${t.terminal.commands.about}\n` +
+        `  projects  - ${t.terminal.commands.projects}\n` +
+        `  contact   - ${t.terminal.commands.contact}\n` +
+        `  github    - ${t.terminal.commands.github}\n` +
+        `  linkedin  - ${t.terminal.commands.linkedin}\n` +
+        `  clear     - ${t.terminal.commands.clear}`;
+      break;
+
+    case "about":
+      output = t.terminal.aboutText;
+      break;
+
+    case "clear":
+      setTerminalHistory([]);
       return;
-    }
 
-    if (
-      trimmed === "contact" ||
-      trimmed === "contato"
-    ) {
-      setTerminalHistory((previous) => [
-        ...previous,
-        `$ ${command}`,
-        "Abrindo contato...",
-      ]);
+    default:
+      output = t.terminal.messages.commandNotFound.replace("{command}", command);
+  }
 
-      router.push("/contato");
-      return;
-    }
-
-    if (trimmed === "github") {
-      window.open(
-        "https://github.com/Daniel-Colonheze",
-        "_blank"
-      );
-
-      setTerminalHistory((previous) => [
-        ...previous,
-        `$ ${command}`,
-        "Redirecionando para o GitHub...",
-      ]);
-
-      return;
-    }
-
-    if (trimmed === "linkedin") {
-      window.open(
-        "https://www.linkedin.com/in/daniel-colonheze/",
-        "_blank"
-      );
-
-      setTerminalHistory((previous) => [
-        ...previous,
-        `$ ${command}`,
-        "Redirecionando para o LinkedIn...",
-      ]);
-
-      return;
-    }
-
-    let output = "";
-
-    switch (trimmed) {
-      case "help":
-        output =
-          "COMANDOS DISPONIVEIS:\n" +
-          "  help      - exibe esta lista de comandos\n" +
-          "  about     - resumo sobre o desenvolvedor\n" +
-          "  projects  - navega para a pagina de Projetos\n" +
-          "  contact   - navega para a pagina de Contato\n" +
-          "  github    - abre o perfil no GitHub\n" +
-          "  linkedin  - abre o perfil no LinkedIn\n" +
-          "  clear     - limpa a tela do terminal";
-        break;
-
-      case "about":
-        output =
-          "Daniel Colonheze | Desenvolvedor Frontend\n" +
-          "Estudante de Engenharia de Software com foco em React, Next.js, Node.js e construção de interfaces 3D interativas.";
-        break;
-
-      case "clear":
-        setTerminalHistory([]);
-        return;
-
-      default:
-        output =
-          `Comando '${command}' nao encontrado. Digite 'help' para instrucoes.`;
-    }
-
-    setTerminalHistory((previous) => [
-      ...previous,
-      `$ ${command}`,
-      output,
-    ]);
-  };
+  setTerminalHistory((previous) => [...previous, `$ ${command}`, output]);
+};
 
   const screenContent = (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto font-mono text-[12px] leading-snug text-purple-200">
         <div className="mb-2 border-b border-purple-800/40 pb-1 text-[10px] text-purple-400">
-          DANIEL OS v1.0 // SISTEMA INTERATIVO
+          {t.terminal.system}
         </div>
 
         {terminalHistory.map((line, index) => (
