@@ -17,26 +17,9 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  /*
-   * Aguarda a animação inicial.
-   *
-   * O SVG pode disparar:
-   * window.dispatchEvent(
-   *   new Event("intro-animation-complete")
-   * );
-   *
-   * Caso o evento não seja disparado, o fallback evita
-   * que o Header fique invisível para sempre.
-   */
   useEffect(() => {
-    let fallbackTimer: ReturnType<typeof setTimeout>;
-
     const handleIntroComplete = () => {
       setIsLoaded(true);
-
-      if (fallbackTimer) {
-        clearTimeout(fallbackTimer);
-      }
     };
 
     window.addEventListener(
@@ -44,42 +27,18 @@ export function Header() {
       handleIntroComplete
     );
 
-    /*
-     * Fallback.
-     *
-     * Isso garante que, caso o SVG não dispare o evento,
-     * o Header ainda apareça.
-     *
-     * Ajuste esse valor para combinar com a duração
-     * da sua animação inicial.
-     */
-    fallbackTimer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 3000);
-
     return () => {
       window.removeEventListener(
         "intro-animation-complete",
         handleIntroComplete
       );
-
-      clearTimeout(fallbackTimer);
     };
   }, []);
 
   const links = [
-    {
-      label: t.header.about,
-      href: "#sobre",
-    },
-    {
-      label: t.header.stack,
-      href: "#stack",
-    },
-    {
-      label: t.header.projects,
-      href: "/projetos",
-    },
+    { label: t.header.about, href: "#sobre" },
+    { label: t.header.stack, href: "#stack" },
+    { label: t.header.projects, href: "/projetos" },
     {
       label: t.header.certificates,
       href: "#certificacoes",
@@ -88,10 +47,7 @@ export function Header() {
       label: t.header.computer,
       href: "#computador",
     },
-    {
-      label: t.header.contact,
-      href: "/contato",
-    },
+    { label: t.header.contact, href: "/contato" },
   ];
 
   const handleNavigation = (href: string) => {
@@ -101,63 +57,20 @@ export function Header() {
       href === "/projetos" ||
       href === "/contato";
 
-    /*
-     * Páginas normais.
-     */
     if (isPage) {
       router.push(href);
       return;
     }
 
-    /*
-     * Links de seção.
-     *
-     * Se estamos fora da Home, primeiro voltamos para "/".
-     * O destino fica salvo temporariamente para que possamos
-     * fazer o scroll depois.
-     */
     if (pathname !== "/") {
-      sessionStorage.setItem(
-        "pending-scroll",
-        href
-      );
-
-      router.push("/");
+      router.push(`/${href}`);
       return;
     }
 
-    /*
-     * Já estamos na Home.
-     *
-     * O Lenis faz o scroll sem alterar a URL.
-     */
     scrollTo(href, {
       duration: 1.5,
     });
   };
-
-  /*
-   * Depois de voltar para a Home, verifica se existe
-   * uma seção pendente para navegar.
-   */
-  useEffect(() => {
-    if (pathname !== "/") return;
-
-    const target =
-      sessionStorage.getItem("pending-scroll");
-
-    if (!target) return;
-
-    sessionStorage.removeItem("pending-scroll");
-
-    const timer = setTimeout(() => {
-      scrollTo(target, {
-        duration: 1.5,
-      });
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [pathname, scrollTo]);
 
   const handleLogo = () => {
     setIsOpen(false);
@@ -172,138 +85,127 @@ export function Header() {
     });
   };
 
-  /*
-   * Enquanto a animação inicial não terminou,
-   * o Header não ocupa espaço nem aparece.
-   */
-  if (!isLoaded) {
-    return null;
-  }
-
   return (
     <AnimatePresence>
-      <motion.header
-        initial={{
-          opacity: 0,
-          y: -20,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        transition={{
-          duration: 0.6,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        className="fixed left-0 right-0 top-0 z-[100] px-4 pt-4 md:px-8"
-      >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-purple-500/10 bg-black/60 px-5 shadow-[0_0_30px_rgba(168,85,247,0.04)] backdrop-blur-xl md:px-7">
-          {/* LOGO */}
-          <button
-            type="button"
-            onClick={handleLogo}
-            className="group font-mono text-sm font-semibold tracking-wider text-white"
-          >
-            Daniel Colonheze
-            <span className="text-purple-400 transition-colors group-hover:text-purple-300">
-              .
-            </span>
-          </button>
-
-          {/* DESKTOP NAVIGATION */}
-          <nav className="hidden items-center gap-7 md:flex">
-            {links.map((link) => (
-              <button
-                key={link.href}
-                type="button"
-                onClick={() =>
-                  handleNavigation(link.href)
-                }
-                className="group relative font-mono text-[11px] uppercase tracking-[0.18em] text-gray-400 transition-colors duration-300 hover:text-white"
-              >
-                {link.label}
-
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-purple-400 transition-all duration-300 group-hover:w-full" />
-              </button>
-            ))}
-          </nav>
-
-          {/* DESKTOP LANGUAGE */}
-          <div className="hidden items-center md:flex">
-            <LanguageSwitcher />
-          </div>
-
-          {/* MOBILE ACTIONS */}
-          <div className="flex items-center gap-3 md:hidden">
-            <LanguageSwitcher />
-
+      {isLoaded && (
+        <motion.header
+          initial={{
+            opacity: 0,
+            y: -20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.6,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="fixed left-0 right-0 top-0 z-[100] px-4 pt-4 md:px-8"
+        >
+          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-purple-500/10 bg-black/60 px-5 shadow-[0_0_30px_rgba(168,85,247,0.04)] backdrop-blur-xl md:px-7">
             <button
               type="button"
-              onClick={() =>
-                setIsOpen((prev) => !prev)
-              }
-              aria-label={
-                isOpen
-                  ? "Fechar menu"
-                  : "Abrir menu"
-              }
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-purple-500/15 bg-purple-500/[0.04] text-gray-300 transition-colors hover:border-purple-400/30 hover:text-white"
+              onClick={handleLogo}
+              className="group font-mono text-sm font-semibold tracking-wider text-white"
             >
-              {isOpen ? (
-                <X size={18} />
-              ) : (
-                <Menu size={18} />
-              )}
+              Daniel Colonheze
+              <span className="text-purple-400 transition-colors group-hover:text-purple-300">
+                .
+              </span>
             </button>
+
+            <nav className="hidden items-center gap-7 md:flex">
+              {links.map((link) => (
+                <button
+                  key={link.href}
+                  type="button"
+                  onClick={() =>
+                    handleNavigation(link.href)
+                  }
+                  className="group relative font-mono text-[11px] uppercase tracking-[0.18em] text-gray-400 transition-colors duration-300 hover:text-white"
+                >
+                  {link.label}
+
+                  <span className="absolute -bottom-1 left-0 h-px w-0 bg-purple-400 transition-all duration-300 group-hover:w-full" />
+                </button>
+              ))}
+            </nav>
+
+            <div className="hidden items-center md:flex">
+              <LanguageSwitcher />
+            </div>
+
+            <div className="flex items-center gap-3 md:hidden">
+              <LanguageSwitcher />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setIsOpen((prev) => !prev)
+                }
+                aria-label={
+                  isOpen
+                    ? "Fechar menu"
+                    : "Abrir menu"
+                }
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-purple-500/15 bg-purple-500/[0.04] text-gray-300 transition-colors hover:border-purple-400/30 hover:text-white"
+              >
+                {isOpen ? (
+                  <X size={18} />
+                ) : (
+                  <Menu size={18} />
+                )}
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* MOBILE MENU */}
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{
-                opacity: 0,
-                y: -10,
-                scale: 0.98,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                scale: 1,
-              }}
-              exit={{
-                opacity: 0,
-                y: -10,
-                scale: 0.98,
-              }}
-              transition={{
-                duration: 0.2,
-              }}
-              className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-2xl border border-purple-500/10 bg-black/90 p-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl md:hidden"
-            >
-              <nav className="flex flex-col">
-                {links.map((link, index) => (
-                  <button
-                    key={link.href}
-                    type="button"
-                    onClick={() =>
-                      handleNavigation(link.href)
-                    }
-                    className="flex items-center justify-between rounded-xl px-4 py-4 text-left font-mono text-xs uppercase tracking-[0.18em] text-gray-400 transition-colors hover:bg-purple-500/[0.06] hover:text-white"
-                  >
-                    <span>{link.label}</span>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: -10,
+                  scale: 0.98,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -10,
+                  scale: 0.98,
+                }}
+                transition={{
+                  duration: 0.2,
+                }}
+                className="mx-auto mt-2 max-w-7xl overflow-hidden rounded-2xl border border-purple-500/10 bg-black/90 p-3 shadow-[0_10px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl md:hidden"
+              >
+                <nav className="flex flex-col">
+                  {links.map((link, index) => (
+                    <button
+                      key={link.href}
+                      type="button"
+                      onClick={() =>
+                        handleNavigation(link.href)
+                      }
+                      className="flex items-center justify-between rounded-xl px-4 py-4 text-left font-mono text-xs uppercase tracking-[0.18em] text-gray-400 transition-colors hover:bg-purple-500/[0.06] hover:text-white"
+                    >
+                      <span>{link.label}</span>
 
-                    <span className="text-purple-400/50">
-                      0{index + 1}
-                    </span>
-                  </button>
-                ))}
-              </nav>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.header>
+                      <span className="text-purple-400/50">
+                        0{index + 1}
+                      </span>
+                    </button>
+                  ))}
+                </nav>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.header>
+      )}
     </AnimatePresence>
   );
 }
