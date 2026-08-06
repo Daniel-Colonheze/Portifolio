@@ -14,6 +14,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useLenisControls } from "@/hooks/useLenis";
 import * as THREE from "three";
 
+type CablePoint = [number, number, number];
+
 const TARGET_HEIGHT = 2.2;
 
 export function Computer({ debug = false }) {
@@ -25,7 +27,7 @@ export function Computer({ debug = false }) {
     new THREE.Vector3(0.3, 0.05, -0.4)
   );
 
-  const [cablePoints, setCablePoints] = useState([
+  const [cablePoints, setCablePoints] = useState<CablePoint[]>([
     [0, 0, 0],
     [0, 0, 0],
     [0, 0, 0],
