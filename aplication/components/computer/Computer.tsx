@@ -781,7 +781,6 @@ export function Computer({ debug = false }) {
           points={cablePoints}
           color="#1a1a1a"
           lineWidth={2}
-          curveType="catmullrom"
         />
       </group>
     </group>
