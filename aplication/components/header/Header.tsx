@@ -18,18 +18,20 @@ export function Header() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const handleLoad = () => {
+    const handleIntroComplete = () => {
       setIsLoaded(true);
     };
 
-    if (document.readyState === "complete") {
-      setIsLoaded(true);
-    } else {
-      window.addEventListener("load", handleLoad);
-    }
+    window.addEventListener(
+      "intro-animation-complete",
+      handleIntroComplete
+    );
 
     return () => {
-      window.removeEventListener("load", handleLoad);
+      window.removeEventListener(
+        "intro-animation-complete",
+        handleIntroComplete
+      );
     };
   }, []);
 
