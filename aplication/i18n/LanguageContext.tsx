@@ -12,37 +12,49 @@ import {
   type Language,
 } from "./translations";
 
+type Translation = (typeof translations)[Language];
+
 type LanguageContextType = {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: typeof translations.pt;
+  t: Translation;
 };
 
-const LanguageContext = createContext<LanguageContextType | undefined>(
-  undefined
-);
+const LanguageContext =
+  createContext<LanguageContextType | undefined>(
+    undefined
+  );
 
 export function LanguageProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [language, setLanguageState] = useState<Language>("pt");
-  const [mounted, setMounted] = useState(false);
+  const [language, setLanguageState] =
+    useState<Language>("pt");
+
+  const [mounted, setMounted] =
+    useState(false);
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem(
-      "portfolio-language"
-    ) as Language | null;
+    const savedLanguage =
+      localStorage.getItem(
+        "portfolio-language"
+      ) as Language | null;
 
-    if (savedLanguage === "pt" || savedLanguage === "en") {
+    if (
+      savedLanguage === "pt" ||
+      savedLanguage === "en"
+    ) {
       setLanguageState(savedLanguage);
     }
 
     setMounted(true);
   }, []);
 
-  const setLanguage = (newLanguage: Language) => {
+  const setLanguage = (
+    newLanguage: Language
+  ) => {
     setLanguageState(newLanguage);
 
     if (typeof window !== "undefined") {
@@ -53,27 +65,15 @@ export function LanguageProvider({
     }
   };
 
-  if (!mounted) {
-    return (
-      <LanguageContext.Provider
-        value={{
-          language,
-          setLanguage,
-          t: translations[language],
-        }}
-      >
-        {children}
-      </LanguageContext.Provider>
-    );
-  }
+  const contextValue: LanguageContextType = {
+    language,
+    setLanguage,
+    t: translations[language],
+  };
 
   return (
     <LanguageContext.Provider
-      value={{
-        language,
-        setLanguage,
-        t: translations[language],
-      }}
+      value={contextValue}
     >
       {children}
     </LanguageContext.Provider>
@@ -81,7 +81,8 @@ export function LanguageProvider({
 }
 
 export function useLanguage() {
-  const context = useContext(LanguageContext);
+  const context =
+    useContext(LanguageContext);
 
   if (!context) {
     throw new Error(

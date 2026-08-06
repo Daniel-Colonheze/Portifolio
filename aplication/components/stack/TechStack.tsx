@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import type { IconType } from "react-icons";
 import {
   SiJavascript,
   SiTypescript,
@@ -23,7 +24,7 @@ type Category = "all" | "frontend" | "backend" | "tools";
 type Technology = {
   name: string;
   level: number;
-  icon: React.ElementType;
+  icon: IconType;
   color: string;
   category: Exclude<Category, "all">;
 };
@@ -118,7 +119,7 @@ const containerVariants = {
     y: 0,
     transition: {
       duration: 0.8,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as const,
       staggerChildren: 0.08,
     },
   },
@@ -134,7 +135,7 @@ const itemVariants = {
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   },
 };
@@ -175,7 +176,7 @@ export function TechStack() {
   ];
 
   return (
-    <section 
+    <section
       id="stack"
       className="relative overflow-hidden border-y border-purple-500/10 bg-black py-20 md:py-28"
     >
@@ -205,7 +206,10 @@ export function TechStack() {
             initial={{ width: 0, opacity: 0 }}
             whileInView={{ width: 96, opacity: 1 }}
             viewport={{ once: false }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            transition={{
+              duration: 0.8,
+              delay: 0.3,
+            }}
             className="mx-auto mt-5 h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent"
           />
         </motion.div>
@@ -261,13 +265,7 @@ export function TechStack() {
 
           {/* GRAFICO */}
           <div className="relative h-[440px] w-full overflow-x-auto overflow-y-hidden pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-purple-500/30">
-            <div
-              className={`relative mx-auto h-full min-w-[760px] ${
-                filteredStack.length <= 5
-                  ? "w-full"
-                  : "w-full"
-              }`}
-            >
+            <div className="relative mx-auto h-full min-w-[760px] w-full">
               {/* GRID */}
               <div className="absolute inset-0 flex flex-col justify-between pb-[88px] pl-11">
                 {[100, 75, 50, 25, 0].map(
@@ -370,7 +368,7 @@ export function TechStack() {
                               1,
                               0.36,
                               1,
-                            ],
+                            ] as const,
                           }}
                           className="absolute bottom-0 w-full overflow-hidden rounded-t-xl"
                           style={{

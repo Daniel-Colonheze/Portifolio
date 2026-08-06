@@ -87,7 +87,8 @@ export function useLenisControls() {
           selector = `#${selector}`;
         }
 
-        const element = document.querySelector(selector);
+        const element =
+          document.querySelector<HTMLElement>(selector);
 
         if (!element) return;
 
