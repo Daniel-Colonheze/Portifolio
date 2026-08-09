@@ -23,9 +23,7 @@ export function Computer({ debug = false }) {
   const { t } = useLanguage();
   const { scrollTo } = useLenisControls();
 
-  const cableAnchorRef = useRef(
-    new THREE.Vector3(0.3, 0.05, -0.4)
-  );
+  const cableAnchorRef = useRef(new THREE.Vector3(0.3, 0.05, -0.4));
 
   const [cablePoints, setCablePoints] = useState<CablePoint[]>([
     [0, 0, 0],
@@ -42,34 +40,21 @@ export function Computer({ debug = false }) {
   const mouseNodeRef = useRef<THREE.Object3D | null>(null);
   const keyNodesRef = useRef<THREE.Object3D[]>([]);
 
-  const activeKeys = useRef(
-    new Map<THREE.Object3D, number>()
-  );
+  const activeKeys = useRef(new Map<THREE.Object3D, number>());
 
   const visibleRef = useRef(true);
   const modelScaleRef = useRef(1);
 
-  // ==========================================
-  // ÂNCORA FIXA DA TELA
-  // ==========================================
+  const screenAnchorRef = useRef<THREE.Object3D | null>(null);
+  const [screenAnchor, setScreenAnchor] = useState<THREE.Object3D | null>(null);
 
-  const screenAnchorRef =
-    useRef<THREE.Object3D | null>(null);
+  const [terminalHistory, setTerminalHistory] = useState<string[]>([
+    t.terminal.systemLoaded,
+    t.terminal.help,
+  ]);
 
-  const [screenAnchor, setScreenAnchor] =
-    useState<THREE.Object3D | null>(null);
-
-  const [terminalHistory, setTerminalHistory] =
-    useState<string[]>([
-      t.terminal.systemLoaded,
-      t.terminal.help,
-    ]);
-
-  const [currentInput, setCurrentInput] =
-    useState("");
-
-  const [anchorReady, setAnchorReady] =
-    useState(false);
+  const [currentInput, setCurrentInput] = useState("");
+  const [anchorReady, setAnchorReady] = useState(false);
 
   // ==========================================
   // CONFIGURAÇÃO DO MODELO
@@ -77,26 +62,20 @@ export function Computer({ debug = false }) {
 
   useLayoutEffect(() => {
     const inner = innerRef.current;
-
     if (!inner) return;
 
     inner.position.set(0, 0, 0);
     inner.scale.set(1, 1, 1);
 
     const box = new THREE.Box3().setFromObject(inner);
-
     const size = new THREE.Vector3();
     const center = new THREE.Vector3();
 
     box.getSize(size);
     box.getCenter(center);
 
-    const scale =
-      TARGET_HEIGHT /
-      Math.max(size.y, 0.001);
-
+    const scale = TARGET_HEIGHT / Math.max(size.y, 0.001);
     inner.scale.setScalar(scale);
-
     modelScaleRef.current = scale;
 
     inner.position.set(
@@ -107,29 +86,12 @@ export function Computer({ debug = false }) {
 
     if (debug) {
       const names: string[] = [];
-
       inner.traverse((object) => {
-        if (object.name) {
-          names.push(
-            `${object.type}:${object.name}`
-          );
-        }
+        if (object.name) names.push(`${object.type}:${object.name}`);
       });
-
-      console.log(
-        "[Computer] nós do GLB:",
-        names
-      );
-
-      console.log(
-        "[Computer] tamanho:",
-        size
-      );
-
-      console.log(
-        "[Computer] escala:",
-        scale
-      );
+      console.log("[Computer] nós do GLB:", names);
+      console.log("[Computer] tamanho:", size);
+      console.log("[Computer] escala:", scale);
     }
   }, [model, debug]);
 
@@ -138,168 +100,69 @@ export function Computer({ debug = false }) {
   // ==========================================
 
   useEffect(() => {
-    // Evita criar uma segunda âncora
-    if (screenAnchorRef.current) {
-      return;
-    }
+    if (screenAnchorRef.current) return;
 
-    const find = (
-      predicate: (
-        object: THREE.Object3D
-      ) => boolean
-    ): THREE.Object3D | null => {
+    const find = (predicate: (object: THREE.Object3D) => boolean): THREE.Object3D | null => {
       let found: THREE.Object3D | null = null;
-
       model.traverse((object) => {
-        if (
-          !found &&
-          predicate(object)
-        ) {
-          found = object;
-        }
+        if (!found && predicate(object)) found = object;
       });
-
       return found;
     };
 
-    // ==========================================
-    // MOUSE
-    // ==========================================
+    mouseNodeRef.current = find((object) => /mouse/i.test(object.name));
 
-    mouseNodeRef.current = find(
-      (object) =>
-        /mouse/i.test(object.name)
-    );
-
-    // ==========================================
-    // MONITOR
-    // ==========================================
-
-    const monitor = find(
-      (object) =>
-        /(screen|tela|monitor|display)/i.test(
-          object.name
-        )
-    );
+    const monitor = find((object) => /(screen|tela|monitor|display)/i.test(object.name));
 
     if (monitor) {
-      monitor.updateWorldMatrix(
-        true,
-        false
-      );
+      monitor.updateWorldMatrix(true, false);
 
-      const box =
-        new THREE.Box3().setFromObject(
-          monitor
-        );
-
+      const box = new THREE.Box3().setFromObject(monitor);
       const size = new THREE.Vector3();
-      const worldCenter =
-        new THREE.Vector3();
+      const worldCenter = new THREE.Vector3();
 
       box.getSize(size);
       box.getCenter(worldCenter);
 
-      const localCenter =
-        monitor.worldToLocal(
-          worldCenter.clone()
-        );
+      const localCenter = monitor.worldToLocal(worldCenter.clone());
 
-      // ==========================================
-      // ÂNCORA DA TELA
-      // POSIÇÃO MANTIDA EXATAMENTE COMO ESTAVA
-      // ==========================================
+      const anchor = new THREE.Object3D();
+      anchor.position.copy(localCenter);
 
-      const anchor =
-        new THREE.Object3D();
-
-      anchor.position.copy(
-        localCenter
-      );
-
-      const frontOffset =
-        Math.min(
-          size.x,
-          size.y,
-          size.z
-        ) / 2;
+      const frontOffset = Math.min(size.x, size.y, size.z) / 2;
 
       // POSIÇÃO ATUAL — NÃO ALTERAR
-      anchor.position.y +=
-        frontOffset * -150;
+      anchor.position.y += frontOffset * -150;
+      anchor.position.x -= frontOffset * 20;
+      anchor.rotation.y = Math.PI / -2;
 
-      anchor.position.x -=
-        frontOffset * 20;
-
-      anchor.rotation.y =
-        Math.PI / -2;
-
-      // Mantém a escala correta
-      const compensScale =
-        1 / modelScaleRef.current;
-
-      anchor.scale.setScalar(
-        compensScale
-      );
-
-      // ==========================================
-      // FIXA A ÂNCORA NO MONITOR
-      // ==========================================
+      const compensScale = 1 / modelScaleRef.current;
+      anchor.scale.setScalar(compensScale);
 
       monitor.add(anchor);
 
-      screenAnchorRef.current =
-        anchor;
-
+      screenAnchorRef.current = anchor;
       setScreenAnchor(anchor);
       setAnchorReady(true);
 
       if (debug) {
-        console.log(
-          "[Computer] monitor encontrado:",
-          monitor.name
-        );
-
-        console.log(
-          "[Computer] tamanho do monitor:",
-          size
-        );
-
-        console.log(
-          "[Computer] posição fixa da tela:",
-          anchor.position
-        );
-
-        console.log(
-          "[Computer] escala da âncora:",
-          compensScale
-        );
+        console.log("[Computer] monitor encontrado:", monitor.name);
+        console.log("[Computer] tamanho do monitor:", size);
+        console.log("[Computer] posição fixa da tela:", anchor.position);
+        console.log("[Computer] escala da âncora:", compensScale);
       }
     } else if (debug) {
-      console.log(
-        "[Computer] nenhum monitor encontrado"
-      );
+      console.log("[Computer] nenhum monitor encontrado");
     }
-
-    // ==========================================
-    // TECLADO
-    // ==========================================
 
     const keys: THREE.Object3D[] = [];
 
     const teclado = find(
-      (object) =>
-        /teclado|keyboard/i.test(
-          object.name
-        ) &&
-        object.type === "Group"
+      (object) => /teclado|keyboard/i.test(object.name) && object.type === "Group"
     );
 
     teclado?.traverse((child) => {
-      if (
-        child.name.startsWith("pCube") &&
-        child.type === "Mesh"
-      ) {
+      if (child.name.startsWith("pCube") && child.type === "Mesh") {
         keys.push(child);
       }
     });
@@ -307,31 +170,14 @@ export function Computer({ debug = false }) {
     keyNodesRef.current = keys;
 
     if (debug) {
-      console.log(
-        "[Computer] mouse encontrado:",
-        !!mouseNodeRef.current
-      );
-
-      console.log(
-        "[Computer] teclas encontradas:",
-        keys.length
-      );
+      console.log("[Computer] mouse encontrado:", !!mouseNodeRef.current);
+      console.log("[Computer] teclas encontradas:", keys.length);
     }
 
-    // ==========================================
-    // LIMPEZA
-    // ==========================================
-
     return () => {
-      if (
-        screenAnchorRef.current &&
-        screenAnchorRef.current.parent
-      ) {
-        screenAnchorRef.current.parent.remove(
-          screenAnchorRef.current
-        );
+      if (screenAnchorRef.current && screenAnchorRef.current.parent) {
+        screenAnchorRef.current.parent.remove(screenAnchorRef.current);
       }
-
       screenAnchorRef.current = null;
     };
   }, [model, debug]);
@@ -341,28 +187,18 @@ export function Computer({ debug = false }) {
   // ==========================================
 
   useEffect(() => {
-    const element =
-      document.getElementById(
-        "computador"
-      );
-
+    const element = document.getElementById("computador");
     if (!element) return;
 
-    const observer =
-      new IntersectionObserver(
-        ([entry]) => {
-          visibleRef.current =
-            entry.isIntersecting;
-        },
-        {
-          threshold: 0.4,
-        }
-      );
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        visibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.4 }
+    );
 
     observer.observe(element);
-
-    return () =>
-      observer.disconnect();
+    return () => observer.disconnect();
   }, []);
 
   // ==========================================
@@ -370,51 +206,19 @@ export function Computer({ debug = false }) {
   // ==========================================
 
   useEffect(() => {
-    const handleMouseMove = (
-      event: MouseEvent
-    ) => {
-      const node =
-        mouseNodeRef.current;
-
+    const handleMouseMove = (event: MouseEvent) => {
+      const node = mouseNodeRef.current;
       if (!node) return;
 
-      const x =
-        (event.clientX /
-          window.innerWidth -
-          0.5) *
-        4;
+      const x = (event.clientX / window.innerWidth - 0.5) * 4;
+      const z = (event.clientY / window.innerHeight - 0.5) * 4;
 
-      const z =
-        (event.clientY /
-          window.innerHeight -
-          0.5) *
-        4;
-
-      node.position.x =
-        THREE.MathUtils.lerp(
-          node.position.x,
-          -z,
-          0.1
-        );
-
-      node.position.z =
-        THREE.MathUtils.lerp(
-          node.position.z,
-          x,
-          0.1
-        );
+      node.position.x = THREE.MathUtils.lerp(node.position.x, -z, 0.1);
+      node.position.z = THREE.MathUtils.lerp(node.position.z, x, 0.1);
     };
 
-    window.addEventListener(
-      "mousemove",
-      handleMouseMove
-    );
-
-    return () =>
-      window.removeEventListener(
-        "mousemove",
-        handleMouseMove
-      );
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   // ==========================================
@@ -422,69 +226,34 @@ export function Computer({ debug = false }) {
   // ==========================================
 
   useEffect(() => {
-    const handleKeyDown = (
-      event: KeyboardEvent
-    ) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (!visibleRef.current) return;
 
-      const keys =
-        keyNodesRef.current;
+      const keys = keyNodesRef.current;
 
       if (keys.length > 0) {
-        const randomKey =
-          keys[
-            Math.floor(
-              Math.random() *
-                keys.length
-            )
-          ];
-
-        activeKeys.current.set(
-          randomKey,
-          performance.now()
-        );
+        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+        activeKeys.current.set(randomKey, performance.now());
       }
 
       if (event.key === "Enter") {
-        executeCommand(
-          currentInput
-        );
-
+        executeCommand(currentInput);
         setCurrentInput("");
-
         return;
       }
 
-      if (
-        event.key ===
-        "Backspace"
-      ) {
-        setCurrentInput(
-          (previous) =>
-            previous.slice(0, -1)
-        );
-
+      if (event.key === "Backspace") {
+        setCurrentInput((previous) => previous.slice(0, -1));
         return;
       }
 
       if (event.key.length === 1) {
-        setCurrentInput(
-          (previous) =>
-            previous + event.key
-        );
+        setCurrentInput((previous) => previous + event.key);
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
-
-    return () =>
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [currentInput]);
 
   // ==========================================
@@ -492,71 +261,34 @@ export function Computer({ debug = false }) {
   // ==========================================
 
   useFrame(() => {
-    const now =
-      performance.now();
+    const now = performance.now();
 
-    activeKeys.current.forEach(
-      (startTime, key) => {
-        const elapsed =
-          now - startTime;
+    activeKeys.current.forEach((startTime, key) => {
+      const elapsed = now - startTime;
+      const duration = 150;
 
-        const duration = 150;
-
-        if (elapsed < duration) {
-          key.position.y =
-            -Math.sin(
-              (elapsed / duration) *
-                Math.PI
-            ) *
-            0.5;
-        } else {
-          key.position.y = 0;
-
-          activeKeys.current.delete(
-            key
-          );
-        }
+      if (elapsed < duration) {
+        key.position.y = -Math.sin((elapsed / duration) * Math.PI) * 0.5;
+      } else {
+        key.position.y = 0;
+        activeKeys.current.delete(key);
       }
-    );
+    });
 
     if (mouseNodeRef.current) {
-      const mousePosition =
-        mouseNodeRef.current.position;
-
-      const anchor =
-        cableAnchorRef.current;
+      const mousePosition = mouseNodeRef.current.position;
+      const anchor = cableAnchorRef.current;
 
       const midPoint = [
-        (anchor.x +
-          mousePosition.x) /
-          2,
-
-        Math.min(
-          anchor.y,
-          0
-        ) - 0.15,
-
-        (anchor.z +
-          mousePosition.z) /
-          2,
-      ] as [
-        number,
-        number,
-        number
-      ];
+        (anchor.x + mousePosition.x) / 2,
+        Math.min(anchor.y, 0) - 0.15,
+        (anchor.z + mousePosition.z) / 2,
+      ] as [number, number, number];
 
       setCablePoints([
-        [
-          anchor.x,
-          anchor.y,
-          anchor.z,
-        ],
+        [anchor.x, anchor.y, anchor.z],
         midPoint,
-        [
-          mousePosition.x,
-          0,
-          mousePosition.z,
-        ],
+        [mousePosition.x, 0, mousePosition.z],
       ]);
     }
   });
@@ -565,135 +297,58 @@ export function Computer({ debug = false }) {
   // TERMINAL / COMANDOS
   // ==========================================
 
-  const executeCommand = (
-    command: string
-  ) => {
-    const trimmed =
-      command
-        .trim()
-        .toLowerCase();
-
+  const executeCommand = (command: string) => {
+    const trimmed = command.trim().toLowerCase();
     if (!trimmed) return;
 
-    // SOBRE
-    if (
-      trimmed === "about" ||
-      trimmed === "sobre"
-    ) {
-      setTerminalHistory(
-        (previous) => [
-          ...previous,
-          `$ ${command}`,
-          t.terminal.messages
-            .openingAbout,
-        ]
-      );
-
-      scrollTo("#sobre", {
-        duration: 1.5,
-      });
-
+    if (trimmed === "about" || trimmed === "sobre") {
+      setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingAbout]);
+      scrollTo("#sobre", { duration: 1.5 });
       return;
     }
 
-    // STACK
-    if (
-      trimmed === "stack" ||
-      trimmed === "tecnologias"
-    ) {
-      setTerminalHistory(
-        (previous) => [
-          ...previous,
-          `$ ${command}`,
-          t.terminal.messages
-            .openingStack,
-        ]
-      );
-
-      scrollTo("#stack", {
-        duration: 1.5,
-      });
-
+    if (trimmed === "stack" || trimmed === "tecnologias") {
+      setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingStack]);
+      scrollTo("#stack", { duration: 1.5 });
       return;
     }
 
-    // PROJETOS
-    if (
-      trimmed === "projects" ||
-      trimmed === "projetos"
-    ) {
-      setTerminalHistory(
-        (previous) => [
-          ...previous,
-          `$ ${command}`,
-          t.terminal.messages
-            .openingProjects,
-        ]
-      );
-
+    if (trimmed === "projects" || trimmed === "projetos") {
+      setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingProjects]);
       router.push("/projetos");
-
       return;
     }
 
-    // CONTATO
-    if (
-      trimmed === "contact" ||
-      trimmed === "contato"
-    ) {
-      setTerminalHistory(
-        (previous) => [
-          ...previous,
-          `$ ${command}`,
-          t.terminal.messages
-            .openingContact,
-        ]
-      );
-
+    if (trimmed === "contact" || trimmed === "contato") {
+      setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingContact]);
       router.push("/contato");
-
       return;
     }
 
-    // GITHUB
     if (trimmed === "github") {
-      window.open(
-        "https://github.com/Daniel-Colonheze",
-        "_blank"
-      );
-
-      setTerminalHistory(
-        (previous) => [
-          ...previous,
-          `$ ${command}`,
-          t.terminal.messages
-            .openingGithub,
-        ]
-      );
-
+      window.open("https://github.com/Daniel-Colonheze", "_blank");
+      setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingGithub]);
       return;
     }
 
-    // LINKEDIN
     if (trimmed === "linkedin") {
-      window.open(
-        "https://www.linkedin.com/in/daniel-colonheze/",
-        "_blank"
-      );
-
-      setTerminalHistory(
-        (previous) => [
-          ...previous,
-          `$ ${command}`,
-          t.terminal.messages
-            .openingLinkedin,
-        ]
-      );
-
+      window.open("https://www.linkedin.com/in/daniel-colonheze/", "_blank");
+      setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.openingLinkedin]);
       return;
     }
 
-    // COMANDOS INTERNOS
+    if (trimmed === "cv" || trimmed === "curriculo" || trimmed === "resume") {
+      const link = document.createElement("a");
+      link.href = "/resume/Daniel-colonheze-curriculo.pdf";
+      link.download = "Daniel-Colonheze-Curriculo.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTerminalHistory((previous) => [...previous, `$ ${command}`, t.terminal.messages.downloadingCV]);
+      return;
+    }
+
     let output = "";
 
     switch (trimmed) {
@@ -705,18 +360,16 @@ export function Computer({ debug = false }) {
           `  stack         - ${t.terminal.commands.stack}\n` +
           `  projects      - ${t.terminal.commands.projects}\n` +
           `  contact       - ${t.terminal.commands.contact}\n` +
+          `  cv            - ${t.terminal.commands.cv}\n` +
           `  github        - ${t.terminal.commands.github}\n` +
           `  linkedin      - ${t.terminal.commands.linkedin}\n` +
           `  curiosidades  - ${t.terminal.commands.curiosidades}\n` +
           `  clear         - ${t.terminal.commands.clear}`;
-
         break;
 
       case "curiosidades":
       case "curiosities":
-        output =
-          t.terminal.curiosidadesText;
-
+        output = t.terminal.curiosidadesText;
         break;
 
       case "clear":
@@ -724,21 +377,10 @@ export function Computer({ debug = false }) {
         return;
 
       default:
-        output =
-          t.terminal.messages
-            .commandNotFound.replace(
-              "{command}",
-              command
-            );
+        output = t.terminal.messages.commandNotFound.replace("{command}", command);
     }
 
-    setTerminalHistory(
-      (previous) => [
-        ...previous,
-        `$ ${command}`,
-        output,
-      ]
-    );
+    setTerminalHistory((previous) => [...previous, `$ ${command}`, output]);
   };
 
   // ==========================================
@@ -747,34 +389,25 @@ export function Computer({ debug = false }) {
 
   const screenContent = (
     <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-y-auto font-mono text-[12px] leading-snug text-purple-200">
+      <div
+        data-lenis-prevent
+        onWheel={(e) => e.stopPropagation()}
+        className="flex-1 overflow-y-auto font-mono text-[12px] leading-snug text-purple-200"
+      >
         <div className="mb-2 border-b border-purple-800/40 pb-1 text-[10px] text-purple-400">
           {t.terminal.system}
         </div>
 
-        {terminalHistory.map(
-          (line, index) => (
-            <pre
-              key={index}
-              className="m-0 whitespace-pre-wrap"
-            >
-              {line}
-            </pre>
-          )
-        )}
+        {terminalHistory.map((line, index) => (
+          <pre key={index} className="m-0 whitespace-pre-wrap">
+            {line}
+          </pre>
+        ))}
 
         <div className="mt-1 flex gap-1 text-purple-100">
-          <span className="text-purple-400">
-            $
-          </span>
-
-          <span>
-            {currentInput}
-          </span>
-
-          <span className="animate-pulse">
-            ▊
-          </span>
+          <span className="text-purple-400">$</span>
+          <span>{currentInput}</span>
+          <span className="animate-pulse">▊</span>
         </div>
       </div>
     </div>
@@ -785,42 +418,35 @@ export function Computer({ debug = false }) {
   // ==========================================
 
   return (
-    <group
-      ref={groupRef}
-      rotation={[0, 0, 0]}
-    >
+    <group ref={groupRef} rotation={[0, 0, 0]}>
       <group ref={innerRef}>
         <primitive object={model} />
 
-        {anchorReady &&
-          screenAnchor && (
-            <primitive
-              object={screenAnchor}
+        {anchorReady && screenAnchor && (
+          <primitive object={screenAnchor}>
+            <Html
+              transform
+              occlude={false}
+              distanceFactor={0.65}
+              zIndexRange={[1, 0]}
+              className="pointer-events-auto"
             >
-              <Html
-                transform
-                occlude={false}
-                distanceFactor={0.65}
-                zIndexRange={[1, 0]}
-                className="pointer-events-none"
+              <div
+                onPointerDown={(e) => e.stopPropagation()}
+                onPointerMove={(e) => e.stopPropagation()}
+                onPointerUp={(e) => e.stopPropagation()}
+                className="h-[320px] w-[550px] overflow-hidden rounded-sm border border-purple-900/70 bg-black/95 p-3 shadow-[0_0_40px_rgba(168,85,247,0.35)]"
               >
-                <div className="h-[320px] w-[550px] overflow-hidden rounded-sm border border-purple-900/70 bg-black/95 p-3 shadow-[0_0_40px_rgba(168,85,247,0.35)]">
-                  {screenContent}
-                </div>
-              </Html>
-            </primitive>
-          )}
+                {screenContent}
+              </div>
+            </Html>
+          </primitive>
+        )}
 
-        <Line
-          points={cablePoints}
-          color="#1a1a1a"
-          lineWidth={2}
-        />
+        <Line points={cablePoints} color="#1a1a1a" lineWidth={2} />
       </group>
     </group>
   );
 }
 
-useGLTF.preload(
-  "/models/desktop.glb"
-);
+useGLTF.preload("/models/desktop.glb");

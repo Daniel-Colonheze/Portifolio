@@ -26,6 +26,8 @@ export const translations = {
       certificates: "Certificações",
       computer: "Computador",
       contact: "Contato",
+      downloadCV: "Baixar currículo", 
+      back: "Voltar",
     },
 
     stack: {
@@ -124,6 +126,7 @@ export const translations = {
         linkedin: "abre o perfil no LinkedIn",
         curiosidades: "exibe algumas curiosidades sobre Daniel",
         clear: "limpa a tela do terminal",
+        cv: "baixa o currículo em PDF",
       },
 
       messages: {
@@ -133,6 +136,7 @@ export const translations = {
         openingContact: "Abrindo contato...",
         openingGithub: "Redirecionando para o GitHub...",
         openingLinkedin: "Redirecionando para o LinkedIn...",
+        downloadingCV: "Baixando currículo...",
         commandNotFound:
           "Comando '{command}' não encontrado. Digite 'help' para instruções.",
       },
@@ -155,6 +159,8 @@ export const translations = {
       certificates: "Certificates",
       computer: "Computer",
       contact: "Contact",
+      downloadCV: "Download resume", 
+      back: "Back",
     },
 
     certifications: {
@@ -264,6 +270,7 @@ export const translations = {
         linkedin: "open LinkedIn profile",
         curiosidades: "display some facts about Daniel",
         clear: "clear the terminal",
+        cv: "downloads the resume as PDF",
       },
 
       messages: {
@@ -273,6 +280,7 @@ export const translations = {
         openingContact: "Opening contact...",
         openingGithub: "Redirecting to GitHub...",
         openingLinkedin: "Redirecting to LinkedIn...",
+        downloadingCV: "Downloading resume...",
         commandNotFound:
           "Command '{command}' not found. Type 'help' for instructions.",
       },

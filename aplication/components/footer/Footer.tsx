@@ -1,15 +1,31 @@
 "use client";
 
-import {
-  FaGithub,
-  FaLinkedinIn
-} from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaGithub, FaLinkedinIn } from "react-icons/fa";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useLenisControls } from "@/hooks/useLenis";
 
 export function Footer() {
   const { t } = useLanguage();
   const { scrollTo } = useLenisControls();
+
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const handleLoad = () => {
+      setIsLoaded(true);
+    };
+
+    if (document.readyState === "complete") {
+      setIsLoaded(true);
+    } else {
+      window.addEventListener("load", handleLoad);
+    }
+
+    return () => {
+      window.removeEventListener("load", handleLoad);
+    };
+  }, []);
 
   const links = [
     {
@@ -84,10 +100,12 @@ export function Footer() {
     window.location.href = "/#sobre";
   };
 
-  return (
-    <footer className="relative overflow-hidden border-t border-purple-500/10 bg-black px-6 py-12 md:px-16">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-700/[0.04] blur-[120px]" />
+  if (!isLoaded) {
+    return null;
+  }
 
+  return (
+    <footer className="relative overflow-hidden border-t border-purple-500/10 bg-black px-6 py-16 md:px-8">
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
           <div className="max-w-md">
@@ -112,16 +130,8 @@ export function Footer() {
                   <a
                     key={link.label}
                     href={link.href}
-                    target={
-                      link.href.startsWith("http")
-                        ? "_blank"
-                        : undefined
-                    }
-                    rel={
-                      link.href.startsWith("http")
-                        ? "noopener noreferrer"
-                        : undefined
-                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={link.label}
                     className="flex h-9 w-9 items-center justify-center rounded-lg border border-purple-500/15 bg-purple-500/[0.04] text-gray-300 transition-all duration-300 hover:border-purple-400/40 hover:bg-purple-500/10 hover:text-purple-300"
                   >
