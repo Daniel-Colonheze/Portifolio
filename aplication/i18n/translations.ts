@@ -100,7 +100,6 @@ export const translations = {
         "Desenvolvedor Fullstack focado em criar aplicações web modernas, responsivas e escaláveis.",
       navigation: "Navegação",
       rights: "Todos os direitos reservados.",
-      builtWith: "Desenvolvido com Next.js",
     },
 
     terminal: {
@@ -245,7 +244,6 @@ export const translations = {
         "Fullstack Developer focused on building modern, responsive, and scalable web applications.",
       navigation: "Navigation",
       rights: "All rights reserved.",
-      builtWith: "Built with Next.js",
     },
 
     terminal: {

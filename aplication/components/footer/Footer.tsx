@@ -114,7 +114,7 @@ export function Footer() {
               onClick={handleLogoClick}
               className="font-mono text-lg font-semibold tracking-wider text-white transition-colors duration-300 hover:text-purple-200"
             >
-              Daniel Colonheze
+              Daniel de Oliveira Colonheze
               <span className="text-purple-400">.</span>
             </button>
 
