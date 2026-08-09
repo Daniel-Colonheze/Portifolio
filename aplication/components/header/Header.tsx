@@ -7,14 +7,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { LanguageSwitcher } from "../language/LanguageSwitcher";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useLenisControls } from "@/hooks/useLenis";
-import { useIsMobile } from "@/hooks/useIsMobile"; // NOVO
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export function Header() {
   const { t } = useLanguage();
   const { scrollTo } = useLenisControls();
   const pathname = usePathname();
   const router = useRouter();
-  const isMobile = useIsMobile(); // NOVO
+  const isMobile = useIsMobile();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -25,7 +25,7 @@ export function Header() {
     { label: t.header.stack, href: "#stack" },
     { label: t.header.projects, href: "/projetos" },
     { label: t.header.certificates, href: "#certificacoes" },
-    ...(!isMobile ? [{ label: t.header.computer, href: "#computador" }] : []), // NOVO: só entra fora do mobile
+    ...(!isMobile ? [{ label: t.header.computer, href: "#computador" }] : []),
     { label: t.header.contact, href: "/contato" },
   ];
 
@@ -78,10 +78,16 @@ export function Header() {
                 animate={{ opacity: 1, x: 0, width: "auto" }}
                 exit={{ opacity: 0, x: -8, width: 0 }}
                 transition={{ duration: 0.25 }}
+                whileHover={{ x: -2 }}
+                whileTap={{ scale: 0.92 }}
                 aria-label={t.header.back}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-purple-500/20 bg-purple-500/[0.06] text-purple-400 transition-colors hover:border-purple-400/40 hover:text-purple-300"
+                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-purple-500/20 bg-purple-500/[0.08] text-purple-400 shadow-[0_0_0_0_rgba(168,85,247,0)] transition-all duration-300 hover:border-purple-400/50 hover:bg-purple-500/[0.15] hover:text-purple-200 hover:shadow-[0_0_16px_rgba(168,85,247,0.25)]"
               >
-                <ArrowLeft size={16} />
+                <ArrowLeft
+                  size={16}
+                  strokeWidth={2.25}
+                  className="transition-transform duration-300 group-hover:-translate-x-0.5"
+                />
               </motion.button>
             )}
           </AnimatePresence>
