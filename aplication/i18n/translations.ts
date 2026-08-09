@@ -77,6 +77,7 @@ export const translations = {
       projectLabel: "Projeto",
       technologies: "Tecnologias",
       privateProject: "Projeto privado",
+      youAreHere: "Você está aqui",
     },
 
     contact: {
@@ -221,6 +222,7 @@ export const translations = {
       projectLabel: "Project",
       technologies: "Technologies",
       privateProject: "Private project",
+      youAreHere: "You are here",
     },
 
     contact: {

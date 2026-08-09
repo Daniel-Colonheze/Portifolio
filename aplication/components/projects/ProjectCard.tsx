@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { FaGithub } from "react-icons/fa";
+import { ArrowUpRight, MapPin } from "lucide-react"; 
 import { projects } from "@/data/projects";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -13,10 +14,7 @@ interface ProjectCardProps {
   index: number;
 }
 
-export function ProjectCard({
-  project,
-  index,
-}: ProjectCardProps) {
+export function ProjectCard({ project, index }: ProjectCardProps) {
   const { t, language } = useLanguage();
 
   const projectTitle = project.title[language];
@@ -26,22 +24,9 @@ export function ProjectCard({
     <motion.article
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{
-        once: false,
-        amount: 0.2,
-      }}
-      transition={{
-        duration: 0.7,
-        delay: index * 0.1,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      whileHover={{
-        y: -8,
-        transition: {
-          duration: 0.3,
-          ease: "easeOut",
-        },
-      }}
+      viewport={{ once: false, amount: 0.2 }}
+      transition={{ duration: 0.7, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -8, transition: { duration: 0.3, ease: "easeOut" } }}
       className="group relative flex min-h-[620px] flex-col overflow-hidden rounded-2xl border border-purple-500/10 bg-gradient-to-b from-purple-500/[0.045] to-transparent p-6 transition-colors duration-300 hover:border-purple-400/30"
     >
       <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-purple-600/[0.08] blur-[70px] transition-all duration-500 group-hover:bg-purple-500/[0.16]" />
@@ -53,13 +38,10 @@ export function ProjectCard({
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between">
         <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-purple-400/60">
-          {t.projects.projectLabel}{" "}
-          {String(index + 1).padStart(2, "0")}
+          {t.projects.projectLabel} {String(index + 1).padStart(2, "0")}
         </span>
 
-        <span className="font-mono text-xs text-gray-600">
-          {project.year}
-        </span>
+        <span className="font-mono text-xs text-gray-600">{project.year}</span>
       </div>
 
       {/* Project image */}
@@ -82,7 +64,6 @@ export function ProjectCard({
           )}
 
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-purple-500/[0.03]" />
-
           <div className="pointer-events-none absolute inset-0 rounded-xl border border-purple-400/0 transition-colors duration-500 group-hover:border-purple-400/20" />
         </div>
       </div>
@@ -90,9 +71,7 @@ export function ProjectCard({
       {/* Project information */}
       <div className="relative z-10 mt-7">
         <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-purple-400/15 bg-purple-500/[0.05] text-purple-400 transition-all duration-300 group-hover:border-purple-400/30 group-hover:bg-purple-500/10 group-hover:shadow-[0_0_25px_rgba(168,85,247,0.12)]">
-          <span className="font-mono text-lg">
-            {String(index + 1).padStart(2, "0")}
-          </span>
+          <span className="font-mono text-lg">{String(index + 1).padStart(2, "0")}</span>
         </div>
 
         <h3 className="font-serif text-3xl text-white transition-colors duration-300 group-hover:text-purple-300">
@@ -100,9 +79,7 @@ export function ProjectCard({
           <span className="text-purple-400">.</span>
         </h3>
 
-        <p className="mt-4 text-sm leading-7 text-gray-400">
-          {projectDescription}
-        </p>
+        <p className="mt-4 text-sm leading-7 text-gray-400">{projectDescription}</p>
       </div>
 
       {/* Technologies */}
@@ -125,8 +102,12 @@ export function ProjectCard({
 
       {/* Links */}
       <div className="relative z-10 mt-auto flex items-center gap-8 pt-8">
-        {/* Project */}
-        {project.link ? (
+        {project.isCurrent ? (
+          <span className="inline-flex items-center gap-2 rounded-full border border-purple-400/30 bg-purple-500/10 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.15em] text-purple-300">
+            <MapPin size={14} />
+            {t.projects.youAreHere}
+          </span>
+        ) : project.link ? (
           <motion.a
             href={project.link}
             target="_blank"
@@ -135,10 +116,7 @@ export function ProjectCard({
             className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.15em] text-purple-400 transition-colors hover:text-purple-300"
           >
             {t.projects.viewProject}
-
-            <span className="text-base">
-              →
-            </span>
+            <ArrowUpRight size={15} /> {/* trocado: era "→" */}
           </motion.a>
         ) : (
           <span className="font-mono text-xs uppercase tracking-[0.15em] text-gray-300">
@@ -157,10 +135,7 @@ export function ProjectCard({
             aria-label="Código no GitHub"
           >
             <FaGithub className="h-4 w-4" />
-
-            <span>
-              Código
-            </span>
+            <span>Código</span>
           </motion.a>
         )}
       </div>
