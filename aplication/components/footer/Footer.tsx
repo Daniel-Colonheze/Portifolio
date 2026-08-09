@@ -188,10 +188,6 @@ export function Footer() {
             © {new Date().getFullYear()} Daniel Colonheze.{" "}
             {t.footer.rights}
           </p>
-
-          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-gray-500">
-            {t.footer.builtWith}
-          </p>
         </div>
       </div>
     </footer>
