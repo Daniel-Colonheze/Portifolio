@@ -47,6 +47,8 @@ export function Computer({ debug = false }) {
 
   const screenAnchorRef = useRef<THREE.Object3D | null>(null);
   const [screenAnchor, setScreenAnchor] = useState<THREE.Object3D | null>(null);
+  const frontOffsetRef = useRef(0);
+  const anchorBaseCenterRef = useRef(new THREE.Vector3());
 
   const [terminalHistory, setTerminalHistory] = useState<string[]>([
     t.terminal.systemLoaded,
@@ -55,6 +57,97 @@ export function Computer({ debug = false }) {
 
   const [currentInput, setCurrentInput] = useState("");
   const [anchorReady, setAnchorReady] = useState(false);
+
+  const [pixelRatio, setPixelRatio] = useState(
+    typeof window !== "undefined" ? window.devicePixelRatio : 1
+  );
+  const [windowHeight, setWindowHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight : 735
+  );
+
+  useEffect(() => {
+    const updatePixelRatio = () => {
+      setPixelRatio(window.devicePixelRatio);
+      setWindowHeight(window.innerHeight);
+    };
+    updatePixelRatio();
+
+    // devicePixelRatio não dispara evento próprio; resize cobre a maioria
+    // dos casos (mover janela entre monitores costuma disparar resize).
+    window.addEventListener("resize", updatePixelRatio);
+
+    // Cobre o caso de zoom do navegador ou troca de monitor sem resize,
+    // reagindo a mudanças de matchMedia baseadas no dpr atual.
+    const mediaQuery = window.matchMedia(
+      `(resolution: ${window.devicePixelRatio}dppx)`
+    );
+    mediaQuery.addEventListener?.("change", updatePixelRatio);
+
+    return () => {
+      window.removeEventListener("resize", updatePixelRatio);
+      mediaQuery.removeEventListener?.("change", updatePixelRatio);
+    };
+  }, []);
+
+  // Pontos de calibração fornecidos por teste manual (janela maximizada
+  // nos dois monitores). Trocamos devicePixelRatio por innerHeight como
+  // variável de referência — o dpr se mostrou instável/inconsistente
+  // entre testes, enquanto a altura real da janela reflete diretamente
+  // a projeção da câmera.
+  // innerHeight 735 -> offset -150 (correto no monitor principal)
+  // innerHeight 524 -> offset  X   (ainda precisa ser calibrado — ver nota)
+  const anchorYOffsetMultiplier = useMemo(() => {
+    const CALIBRATION_HEIGHT_LOW = 524;
+    const CALIBRATION_HEIGHT_HIGH = 735;
+    const CALIBRATION_VALUE_LOW = 100;
+    const CALIBRATION_VALUE_HIGH = -150;
+
+    const slope =
+      (CALIBRATION_VALUE_HIGH - CALIBRATION_VALUE_LOW) /
+      (CALIBRATION_HEIGHT_HIGH - CALIBRATION_HEIGHT_LOW);
+
+    return (
+      CALIBRATION_VALUE_LOW +
+      slope * (windowHeight - CALIBRATION_HEIGHT_LOW)
+    );
+  }, [windowHeight]);
+
+  // ==========================================
+  // RESPONSIVIDADE (NOVO)
+  // ==========================================
+  // Guarda a largura da viewport para recalcular escala/tamanho do Html
+  // sempre que a tela mudar (resize, troca de monitor, orientação etc).
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1920
+  );
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Fator de escala do "monitor virtual" (Html) com base na largura da tela.
+  // Interpola suavemente entre um mínimo e o tamanho original (1),
+  // em vez de aplicar valores fixos em px que quebram em telas pequenas.
+  const htmlScale = useMemo(() => {
+    const MIN_WIDTH = 360; // menor viewport considerada
+    const MAX_WIDTH = 1440; // viewport "de referência" (tamanho original)
+    const MIN_SCALE = 0.55;
+
+    const clampedWidth = Math.min(Math.max(viewportWidth, MIN_WIDTH), MAX_WIDTH);
+    const progress = (clampedWidth - MIN_WIDTH) / (MAX_WIDTH - MIN_WIDTH);
+
+    return MIN_SCALE + progress * (1 - MIN_SCALE);
+  }, [viewportWidth]);
+
+  // distanceFactor do <Html> também precisa acompanhar a escala,
+  // senão o texto/tela fica desproporcional em telas pequenas.
+  const distanceFactor = useMemo(() => {
+    const BASE_DISTANCE_FACTOR = 0.65;
+    return BASE_DISTANCE_FACTOR / htmlScale;
+  }, [htmlScale]);
 
   // ==========================================
   // CONFIGURAÇÃO DO MODELO
@@ -126,13 +219,20 @@ export function Computer({ debug = false }) {
 
       const localCenter = monitor.worldToLocal(worldCenter.clone());
 
+      anchorBaseCenterRef.current.copy(localCenter);
+
       const anchor = new THREE.Object3D();
       anchor.position.copy(localCenter);
 
       const frontOffset = Math.min(size.x, size.y, size.z) / 2;
+      frontOffsetRef.current = frontOffset;
 
-      // POSIÇÃO ATUAL — NÃO ALTERAR
-      anchor.position.y += frontOffset * -150;
+      // Offset Y agora vem do multiplicador calibrado por devicePixelRatio
+      // (ver bloco "CALIBRAÇÃO POR DEVICE PIXEL RATIO" acima) em vez de um
+      // valor fixo — era isso que fazia o monitor principal e o secundário
+      // exigirem números opostos (-150 vs 20). anchorBaseCenterRef guarda
+      // a posição pura (sem offset) para permitir recalcular sem acumular.
+      anchor.position.y += frontOffset * anchorYOffsetMultiplier;
       anchor.position.x -= frontOffset * 20;
       anchor.rotation.y = Math.PI / -2;
 
@@ -181,6 +281,36 @@ export function Computer({ debug = false }) {
       screenAnchorRef.current = null;
     };
   }, [model, debug]);
+
+  // ==========================================
+  // RECALIBRA A ÂNCORA QUANDO O MONITOR MUDA (NOVO)
+  // ==========================================
+  // A âncora só é criada uma vez (efeito acima tem early-return). Se o
+  // usuário mover a janela do navegador para um monitor com escala de
+  // DPI diferente sem recarregar a página, o pixelRatio muda mas a
+  // âncora já existe — então recalculamos só a posição Y aqui, sem
+  // recriar a âncora inteira.
+  useEffect(() => {
+    const anchor = screenAnchorRef.current;
+    if (!anchor) return;
+
+    const frontOffset = frontOffsetRef.current;
+    const base = anchorBaseCenterRef.current;
+
+    // Recalcula a partir da posição base pura (sem offset acumulado),
+    // igual ao cálculo feito na criação da âncora.
+    anchor.position.y = base.y + frontOffset * anchorYOffsetMultiplier;
+    anchor.position.x = base.x - frontOffset * 20;
+
+    if (debug) {
+      console.log(
+        "[Computer] âncora recalibrada — devicePixelRatio:",
+        pixelRatio,
+        "novo offset Y:",
+        anchorYOffsetMultiplier
+      );
+    }
+  }, [pixelRatio, windowHeight, anchorYOffsetMultiplier, debug]);
 
   // ==========================================
   // DETECTA SE O COMPUTADOR ESTÁ VISÍVEL
@@ -424,10 +554,16 @@ export function Computer({ debug = false }) {
 
         {anchorReady && screenAnchor && (
           <primitive object={screenAnchor}>
+            {/*
+              distanceFactor agora é dinâmico (ver useMemo acima):
+              em telas menores ele aumenta, compensando a redução do
+              container em px/vw e evitando que o "monitor virtual"
+              pareça descer/desalinhar do monitor 3D.
+            */}
             <Html
               transform
               occlude={false}
-              distanceFactor={0.65}
+              distanceFactor={distanceFactor}
               zIndexRange={[1, 0]}
               className="pointer-events-auto"
             >
@@ -435,7 +571,18 @@ export function Computer({ debug = false }) {
                 onPointerDown={(e) => e.stopPropagation()}
                 onPointerMove={(e) => e.stopPropagation()}
                 onPointerUp={(e) => e.stopPropagation()}
-                className="h-[320px] w-[550px] overflow-hidden rounded-sm border border-purple-900/70 bg-black/95 p-3 shadow-[0_0_40px_rgba(168,85,247,0.35)]"
+                style={{
+                  // Antes: w-[550px] h-[320px] fixos, que "sobravam"
+                  // em telas pequenas e empurravam o conteúdo pra baixo.
+                  // Agora: tamanho base em px, escalado via transform
+                  // com o mesmo fator usado no distanceFactor, mantendo
+                  // a proporção e a posição relativa ao monitor 3D.
+                  width: "550px",
+                  height: "320px",
+                  transform: `scale(${htmlScale})`,
+                  transformOrigin: "center center",
+                }}
+                className="overflow-hidden rounded-sm border border-purple-900/70 bg-black/95 p-3 shadow-[0_0_40px_rgba(168,85,247,0.35)]"
               >
                 {screenContent}
               </div>

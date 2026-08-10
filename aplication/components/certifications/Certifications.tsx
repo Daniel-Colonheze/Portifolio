@@ -13,6 +13,13 @@ const certifications = [
     image: "/images/certifications/udemy.png",
     link: "https://udemy-certificate.s3.amazonaws.com/pdf/UC-1400b521-d07e-47ab-abc7-0b5e666b2e77.pdf",
   },
+  {
+        title: "Certificado AWS",
+        institution: "AWS",
+        year: "2026",
+        image: "/images/certifications/certificado-1.png",
+        link: "/images/certifications/Certificado-1.png",
+  },
 ];
 
 const badges = [

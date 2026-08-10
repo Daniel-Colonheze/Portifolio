@@ -82,7 +82,18 @@ export function ComputerSection() {
           delay: 0.15,
           ease: [0.22, 1, 0.36, 1],
         }}
-        className="relative mx-auto mt-10 h-[72vh] min-h-[560px] w-full max-w-[1500px] px-4 md:mt-12 md:px-8"
+        // ANTES: "h-[72vh] min-h-[560px]" — a altura dependia só da
+        // viewport height, então em monitores com proporção de tela
+        // diferente o Canvas mudava de aspect ratio. Como a câmera
+        // (fov=40) é fixa, isso deslocava a projeção do monitor virtual
+        // (Html) verticalmente — era a causa real do "descer" no
+        // monitor secundário.
+        //
+        // AGORA: aspect ratio fixo (16/9), com max-h/min-h como limites
+        // de segurança. Isso mantém a proporção do Canvas estável entre
+        // monitores diferentes, então a câmera projeta a cena sempre do
+        // mesmo jeito, independente da altura real da tela do usuário.
+        className="relative mx-auto mt-10 aspect-[16/9] max-h-[72vh] min-h-[560px] w-full max-w-[1500px] px-4 md:mt-12 md:px-8"
       >
         <div className="pointer-events-none absolute inset-x-4 inset-y-0 rounded-2xl border border-purple-500/20 shadow-[0_0_60px_rgba(168,85,247,0.05)] md:inset-x-8" />
 
