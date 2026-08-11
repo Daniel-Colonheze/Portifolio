@@ -33,6 +33,7 @@ type ControlsData = {
   onMove: (axis: Axis, layer: number, direction: 1 | -1) => void;
   onShuffle: () => void;
   onUndo: () => void;
+  onReset: () => void;
 };
 
 const SIZE = 1;
@@ -290,6 +291,7 @@ function CubeScene({
   const rotationGroup = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
   const moveHistory = useRef<Move[]>([]);
+  const fullHistory = useRef<(Move & { origin: "user" | "shuffle" })[]>([]);
   const { camera, size } = useThree();
 
   const dragRef = useRef<{
@@ -321,6 +323,7 @@ function CubeScene({
     duration: number;
     queue: Move[];
     isUndo: boolean;
+    isShuffle: boolean;
   }>({
     active: false,
     axis: null,
@@ -330,6 +333,7 @@ function CubeScene({
     duration: 260,
     queue: [],
     isUndo: false,
+    isShuffle: false,
   });
 
   const currentRotation = useRef(0);
@@ -354,11 +358,27 @@ function CubeScene({
 
       if (countMove) {
         if (isUndo) {
-          moveHistory.current.pop();
-          setMoves(Math.max(0, moveHistory.current.length));
+          // find and remove the last matching original move in fullHistory
+          // completed rotation used the inverse direction, so we search for the opposite
+          const targetDir = -direction as 1 | -1;
+          for (let i = fullHistory.current.length - 1; i >= 0; i--) {
+            const entry = fullHistory.current[i];
+            if (entry.axis === axis && entry.layer === layer && entry.direction === targetDir) {
+              const [removed] = fullHistory.current.splice(i, 1);
+              if (removed.origin === "user") {
+                moveHistory.current.pop();
+                setMoves(Math.max(0, moveHistory.current.length));
+              }
+              break;
+            }
+          }
         } else {
-          moveHistory.current.push({ axis, layer, direction });
-          setMoves(moveHistory.current.length);
+          const origin = animationRef.current.isShuffle ? "shuffle" : "user";
+          fullHistory.current.push({ axis, layer, direction, origin });
+          if (origin === "user") {
+            moveHistory.current.push({ axis, layer, direction });
+            setMoves(moveHistory.current.length);
+          }
         }
       }
 
@@ -368,12 +388,13 @@ function CubeScene({
       animationRef.current.axis = null;
       animationRef.current.layer = null;
       animationRef.current.isUndo = false;
+      animationRef.current.isShuffle = false;
       setRotating(false);
     },
     [applyMoveToCube]
   );
 
-  const startAnimation = useCallback((move: Move, duration: number, isUndo = false) => {
+  const startAnimation = useCallback((move: Move, duration: number, isUndo = false, isShuffle = false) => {
     animationRef.current = {
       active: true,
       axis: move.axis,
@@ -383,6 +404,7 @@ function CubeScene({
       duration,
       queue: animationRef.current.queue,
       isUndo,
+      isShuffle,
     };
     currentRotation.current = 0;
     setRotating(true);
@@ -400,7 +422,27 @@ function CubeScene({
     if (rotating || animationRef.current.active) return;
     const lastMove = moveHistory.current[moveHistory.current.length - 1];
     if (!lastMove) return;
+    // mark this as an undo operation; startAnimation will handle popping from fullHistory
+    animationRef.current.isShuffle = false;
     startAnimation({ axis: lastMove.axis, layer: lastMove.layer, direction: (lastMove.direction * -1) as 1 | -1 }, 260, true);
+  }, [rotating, startAnimation]);
+
+  const resetCube = useCallback(() => {
+    if (rotating || animationRef.current.active) return;
+    const history = fullHistory.current.slice();
+    if (history.length === 0) return;
+
+    const inverse = history
+      .slice()
+      .reverse()
+      .map((m) => ({ axis: m.axis, layer: m.layer, direction: (m.direction * -1) as 1 | -1 }));
+
+    const first = inverse.shift();
+    if (!first) return;
+
+    animationRef.current.isShuffle = false;
+    animationRef.current.queue = inverse as Move[];
+    startAnimation(first, 280, true);
   }, [rotating, startAnimation]);
 
   const shuffleCube = useCallback(() => {
@@ -422,14 +464,14 @@ function CubeScene({
       });
     }
 
-    moveHistory.current = [];
-    setMoves(0);
-
     const firstMove = queue.shift();
     if (!firstMove) return;
 
+    // mark upcoming animations as shuffle so they are stored in fullHistory but
+    // won't increment the user-visible move counter
+    animationRef.current.isShuffle = true;
     animationRef.current.queue = queue;
-    startAnimation(firstMove, 170, false);
+    startAnimation(firstMove, 170, false, true);
   }, [rotating, startAnimation]);
 
   useEffect(() => {
@@ -439,8 +481,9 @@ function CubeScene({
       onMove: performMove,
       onShuffle: shuffleCube,
       onUndo: undoMove,
+      onReset: resetCube,
     });
-  }, [moves, performMove, shuffleCube, undoMove]);
+  }, [moves, performMove, shuffleCube, undoMove, resetCube]);
 
   useFrame((_, delta) => {
     const animation = animationRef.current;
@@ -462,7 +505,8 @@ function CubeScene({
         finishRotation(completedMove.axis, completedMove.layer, completedMove.direction, true, wasUndo);
 
         if (nextMove) {
-          setTimeout(() => startAnimation(nextMove, 170, false), 25);
+          const isShuffleNext = animation.isShuffle || false;
+          setTimeout(() => startAnimation(nextMove, 170, false, isShuffleNext), 25);
         }
       }
       return;
@@ -628,7 +672,7 @@ function CubeScene({
 
 // ---------- controls UI ----------
 
-function CubeControls({ moves, canUndo, onMove, onShuffle, onUndo }: ControlsData) {
+function CubeControls({ moves, canUndo, onMove, onShuffle, onUndo, onReset }: ControlsData) {
   const buttonStyle: React.CSSProperties = {
     minWidth: "clamp(40px, 11vw, 48px)",
     height: "clamp(38px, 10vw, 42px)",
@@ -745,6 +789,18 @@ function CubeControls({ moves, canUndo, onMove, onShuffle, onUndo }: ControlsDat
         >
           Embaralhar
         </button>
+        <button
+          type="button"
+          style={{
+            ...buttonStyle,
+            minWidth: "clamp(82px, 22vw, 110px)",
+            borderColor: "rgba(167, 139, 250, 0.4)",
+            background: "rgba(167, 139, 250, 0.08)",
+          }}
+          onClick={onReset}
+        >
+          Reset
+        </button>
       </div>
     </div>
   );
@@ -799,6 +855,7 @@ function CanvasContainer() {
           onMove={controls.onMove}
           onShuffle={controls.onShuffle}
           onUndo={controls.onUndo}
+          onReset={controls.onReset}
         />
       )}
     </div>

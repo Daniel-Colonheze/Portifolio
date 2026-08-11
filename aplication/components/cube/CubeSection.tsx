@@ -23,7 +23,8 @@ export function CubeSection() {
           <p className="mt-5 max-w-md text-sm leading-6 text-[#f5f5f7]/50 sm:mt-7 sm:text-base sm:leading-7 md:text-lg">
             Gosto de criar experiências interativas usando tecnologias como
             Three.js e Blender, transformando ideias em interfaces dinâmicas,
-            simples e interessantes de explorar.
+            simples e interessantes de explorar. (Ctrl + Scroll para dar zoom no cubo.
+)
           </p>
         </div>
 
