@@ -89,6 +89,14 @@ export function Hero() {
           src="/images/profile.jpg"
           alt="Daniel Colonheze"
           fill
+          // sizes adicionado: sem isso, o Next.js não sabe de antemão o
+          // tamanho real da imagem em cada breakpoint (220px/270px/315px/
+          // 340px, conforme as classes h-/w- acima), então ela pode
+          // carregar num tamanho e "reajustar" o layout depois — esse
+          // reflow, mesmo pequeno, empurra a seção do computador 3D pra
+          // uma posição diferente da que a âncora 3D foi calculada,
+          // explicando o "começa certo, fica errado depois de carregar".
+          sizes="(min-width: 1024px) 340px, (min-width: 768px) 315px, (min-width: 640px) 270px, 220px"
           className="object-cover"
           priority
         />

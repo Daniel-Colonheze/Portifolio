@@ -24,9 +24,9 @@ export const translations = {
       stack: "Stack",
       projects: "Projetos",
       certificates: "Certificações",
-      computer: "Computador",
+      cube: "Cubo",
       contact: "Contato",
-      downloadCV: "Baixar currículo", 
+      downloadCV: "Baixar currículo",
       back: "Voltar",
     },
 
@@ -42,21 +42,6 @@ export const translations = {
         backend: "Backend",
         tools: "Ferramentas",
       },
-    },
-
-    computer: {
-      label: "COMPUTADOR INTERATIVO",
-      title: "Forma interativa de explorar meu portfólio",
-      description:
-        "Digite o comando 'help' para visualizar as opções disponíveis para acessar os projetos e contato. O zoom funciona apenas dentro da animação do Three.js, então, se quiser subir de volta, use a barra lateral. Arraste para rotacionar o computador, use o scroll para aproximar ou afastar e interaja com os elementos da tela para explorar meu portfólio.",
-      drag: "Arrastar",
-      scroll: "Scroll",
-      interact: "Interagir",
-      interactiveArea: "ÁREA INTERATIVA",
-      dragToExplore: "Arraste para explorar • Scroll para zoom",
-      explore: "EXPLORE",
-      footer:
-        "Passe o cursor sobre a área interativa para controlar o computador sem interferir no scroll da página.",
     },
 
     mobileNavigation: {
@@ -101,46 +86,6 @@ export const translations = {
       navigation: "Navegação",
       rights: "Todos os direitos reservados.",
     },
-
-    terminal: {
-      system: "DANIEL OS v1.0 // SISTEMA INTERATIVO",
-      systemLoaded: "Sistema Operacional v1.0.0 carregado.",
-      help: "Digite 'help' para listar os comandos disponíveis.",
-
-      aboutText:
-        "Gosto de desenvolver utilizando ideias criativas e inovadoras, dessa forma montando sistemas completos e interativos. Para mim, desenvolver é um processo constante de aprender, experimentar e evoluir. É isso que torna cada projeto uma oportunidade de fazer algo melhor do que o anterior.",
-
-      curiosidadesTitle: "CURIOSIDADES SOBRE MIM:",
-
-      curiosidadesText:
-        "Tenho 19 anos, amo futebol e programação. Minhas comidas preferidas são pizza e lasanha. Tenho interesse nas áreas de Fullstack Development, Cloud (AWS) e Cybersecurity.",
-
-      commands: {
-        title: "COMANDOS DISPONÍVEIS:",
-        help: "exibe esta lista de comandos",
-        about: "navega para a seção Sobre",
-        stack: "navega para a seção Stack",
-        projects: "navega para a página de Projetos",
-        contact: "navega para a página de Contato",
-        github: "abre o perfil no GitHub",
-        linkedin: "abre o perfil no LinkedIn",
-        curiosidades: "exibe algumas curiosidades sobre Daniel",
-        clear: "limpa a tela do terminal",
-        cv: "baixa o currículo em PDF",
-      },
-
-      messages: {
-        openingAbout: "Navegando para Sobre...",
-        openingStack: "Navegando para Stack...",
-        openingProjects: "Abrindo projetos...",
-        openingContact: "Abrindo contato...",
-        openingGithub: "Redirecionando para o GitHub...",
-        openingLinkedin: "Redirecionando para o LinkedIn...",
-        downloadingCV: "Baixando currículo...",
-        commandNotFound:
-          "Comando '{command}' não encontrado. Digite 'help' para instruções.",
-      },
-    },
   },
 
   en: {
@@ -157,9 +102,9 @@ export const translations = {
       stack: "Stack",
       projects: "Projects",
       certificates: "Certificates",
-      computer: "Computer",
+      cube: "Cube",
       contact: "Contact",
-      downloadCV: "Download resume", 
+      downloadCV: "Download resume",
       back: "Back",
     },
 
@@ -186,21 +131,6 @@ export const translations = {
         backend: "Backend",
         tools: "Tools",
       },
-    },
-
-    computer: {
-      label: "INTERACTIVE COMPUTER",
-      title: "Interactive way to explore my portfolio",
-      description:
-        "Type 'help' to see the available commands to access projects and contact. The zoom works only within the Three.js animation, so if you want to go back up, use the sidebar. Drag to rotate the computer, use the scroll wheel to zoom in or out, and interact with the elements on the screen to explore my portfolio.",
-      drag: "Drag",
-      scroll: "Scroll",
-      interact: "Interact",
-      interactiveArea: "INTERACTIVE AREA",
-      dragToExplore: "Drag to explore • Scroll to zoom",
-      explore: "EXPLORE",
-      footer:
-        "Hover over the interactive area to control the computer without interfering with the page scroll.",
     },
 
     mobileNavigation: {
@@ -244,46 +174,6 @@ export const translations = {
         "Fullstack Developer focused on building modern, responsive, and scalable web applications.",
       navigation: "Navigation",
       rights: "All rights reserved.",
-    },
-
-    terminal: {
-      system: "DANIEL OS v1.0 // INTERACTIVE SYSTEM",
-      systemLoaded: "Operating System v1.0.0 loaded.",
-      help: "Type 'help' to list available commands.",
-
-      aboutText:
-        "I enjoy developing using creative and innovative ideas, building complete and interactive systems. For me, development is a constant process of learning, experimenting, and evolving. That's what makes every project an opportunity to create something better than the last.",
-
-      curiosidadesTitle: "FUN FACTS ABOUT ME:",
-
-      curiosidadesText:
-        "I'm 19 years old and I love soccer and programming. My favorite foods are pizza and lasagna. I'm interested in Fullstack Development, Cloud (AWS), and Cybersecurity.",
-
-      commands: {
-        title: "AVAILABLE COMMANDS:",
-        help: "display this list of commands",
-        about: "navigate to the About section",
-        stack: "navigate to the Stack section",
-        projects: "navigate to the Projects page",
-        contact: "navigate to the Contact page",
-        github: "open GitHub profile",
-        linkedin: "open LinkedIn profile",
-        curiosidades: "display some facts about Daniel",
-        clear: "clear the terminal",
-        cv: "downloads the resume as PDF",
-      },
-
-      messages: {
-        openingAbout: "Navigating to About...",
-        openingStack: "Navigating to Stack...",
-        openingProjects: "Opening projects...",
-        openingContact: "Opening contact...",
-        openingGithub: "Redirecting to GitHub...",
-        openingLinkedin: "Redirecting to LinkedIn...",
-        downloadingCV: "Downloading resume...",
-        commandNotFound:
-          "Command '{command}' not found. Type 'help' for instructions.",
-      },
     },
   },
 } as const;
