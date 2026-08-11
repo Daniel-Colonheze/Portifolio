@@ -28,7 +28,6 @@ type Move = {
 };
 
 type ControlsData = {
-  moves: number;
   canUndo: boolean;
   onMove: (axis: Axis, layer: number, direction: 1 | -1) => void;
   onShuffle: () => void;
@@ -286,7 +285,7 @@ function CubeScene({
 }) {
   const [cubies, setCubies] = useState<CubieData[]>(createCubies);
   const [rotating, setRotating] = useState(false);
-  const [moves, setMoves] = useState(0);
+  // moves counter removed — we keep internal moveHistory for undo only
 
   const rotationGroup = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
@@ -324,6 +323,7 @@ function CubeScene({
     queue: Move[];
     isUndo: boolean;
     isShuffle: boolean;
+    isReset: boolean;
   }>({
     active: false,
     axis: null,
@@ -334,6 +334,7 @@ function CubeScene({
     queue: [],
     isUndo: false,
     isShuffle: false,
+    isReset: false,
   });
 
   const currentRotation = useRef(0);
@@ -365,10 +366,9 @@ function CubeScene({
             const entry = fullHistory.current[i];
             if (entry.axis === axis && entry.layer === layer && entry.direction === targetDir) {
               const [removed] = fullHistory.current.splice(i, 1);
-              if (removed.origin === "user") {
-                moveHistory.current.pop();
-                setMoves(Math.max(0, moveHistory.current.length));
-              }
+                  if (removed.origin === "user") {
+                    moveHistory.current.pop();
+                  }
               break;
             }
           }
@@ -377,7 +377,6 @@ function CubeScene({
           fullHistory.current.push({ axis, layer, direction, origin });
           if (origin === "user") {
             moveHistory.current.push({ axis, layer, direction });
-            setMoves(moveHistory.current.length);
           }
         }
       }
@@ -387,6 +386,15 @@ function CubeScene({
       animationRef.current.active = false;
       animationRef.current.axis = null;
       animationRef.current.layer = null;
+
+      // if this was part of a full reset sequence and this was the last move,
+      // clear the user's visible move counter and histories now
+      if (isUndo && animationRef.current.isReset && animationRef.current.queue.length === 0) {
+        moveHistory.current = [];
+        fullHistory.current = [];
+        animationRef.current.isReset = false;
+      }
+
       animationRef.current.isUndo = false;
       animationRef.current.isShuffle = false;
       setRotating(false);
@@ -440,9 +448,11 @@ function CubeScene({
     const first = inverse.shift();
     if (!first) return;
 
+    // mark reset in progress; clear counter only after undo animation completes
+    animationRef.current.isReset = true;
     animationRef.current.isShuffle = false;
     animationRef.current.queue = inverse as Move[];
-    startAnimation(first, 280, true);
+    startAnimation(first, 280, true, false);
   }, [rotating, startAnimation]);
 
   const shuffleCube = useCallback(() => {
@@ -476,14 +486,13 @@ function CubeScene({
 
   useEffect(() => {
     onControlsReady({
-      moves,
       canUndo: moveHistory.current.length > 0,
       onMove: performMove,
       onShuffle: shuffleCube,
       onUndo: undoMove,
       onReset: resetCube,
     });
-  }, [moves, performMove, shuffleCube, undoMove, resetCube]);
+  }, [performMove, shuffleCube, undoMove, resetCube]);
 
   useFrame((_, delta) => {
     const animation = animationRef.current;
@@ -506,7 +515,8 @@ function CubeScene({
 
         if (nextMove) {
           const isShuffleNext = animation.isShuffle || false;
-          setTimeout(() => startAnimation(nextMove, 170, false, isShuffleNext), 25);
+          const isUndoNext = (animation.isUndo || animation.isReset) as boolean;
+          setTimeout(() => startAnimation(nextMove, 170, isUndoNext, isShuffleNext), 25);
         }
       }
       return;
@@ -672,7 +682,7 @@ function CubeScene({
 
 // ---------- controls UI ----------
 
-function CubeControls({ moves, canUndo, onMove, onShuffle, onUndo, onReset }: ControlsData) {
+function CubeControls({ canUndo, onMove, onShuffle, onUndo, onReset }: ControlsData) {
   const buttonStyle: React.CSSProperties = {
     minWidth: "clamp(40px, 11vw, 48px)",
     height: "clamp(38px, 10vw, 42px)",
@@ -749,17 +759,7 @@ function CubeControls({ moves, canUndo, onMove, onShuffle, onUndo, onReset }: Co
           width: "100%",
         }}
       >
-        <span
-          style={{
-            color: "rgba(245, 245, 247, 0.65)",
-            fontSize: "clamp(10px, 2.8vw, 12px)",
-            fontFamily: "var(--font-geist-mono)",
-            letterSpacing: "0.04em",
-            whiteSpace: "nowrap",
-          }}
-        >
-          MOVIMENTOS <strong style={{ color: "#a78bfa", fontWeight: 500 }}>{moves}</strong>
-        </span>
+        {/* moves counter removed */}
 
         <button
           type="button"
@@ -850,7 +850,6 @@ function CanvasContainer() {
 
       {controls && (
         <CubeControls
-          moves={controls.moves}
           canUndo={controls.canUndo}
           onMove={controls.onMove}
           onShuffle={controls.onShuffle}
