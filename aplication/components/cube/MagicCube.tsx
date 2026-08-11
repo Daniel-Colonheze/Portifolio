@@ -149,7 +149,7 @@ function screenDirection(
   const a = origin.clone().project(camera);
   const b = origin.clone().add(worldDir.clone().multiplyScalar(0.15)).project(camera);
   const dx = ((b.x - a.x) * size.width) / 2;
-  const dy = (-(b.y - a.y) * size.height) / 2; // NDC y is up, screen y is down
+  const dy = (-(b.y - a.y) * size.height) / 2;
   const len = Math.hypot(dx, dy) || 1;
   return { x: dx / len, y: dy / len };
 }
@@ -219,35 +219,47 @@ function Cubie({
 
 // ---------- camera responsiveness ----------
 
-function ResponsiveCamera({ pointerDown }: { pointerDown: boolean }) {
+function ResponsiveCamera({
+  pointerDown,
+  pointerOver,
+  controlsRef,
+}: {
+  pointerDown: boolean;
+  pointerOver: boolean;
+  controlsRef: React.MutableRefObject<any>;
+}) {
   const { camera, size } = useThree();
+  const isMobile = size.width < 640;
+  const prevMobile = useRef<boolean | null>(null);
 
   useEffect(() => {
-    const aspect = size.width / size.height;
-    // Base distance tuned for a 3x3 cube of side STEP*3; pull back further on
-    // narrow/tall viewports so the cube always fits without cropping.
-    const base = 8.6;
-    const narrowBoost = aspect < 1 ? (1 / aspect) * 1.15 : 1;
-    const distance = THREE.MathUtils.clamp(base * narrowBoost, 8.5, 15);
+    if (prevMobile.current === isMobile) return;
+    prevMobile.current = isMobile;
 
+    const distance = isMobile ? 12.5 : 9.5;
     const dir = new THREE.Vector3(0.62, 0.55, 0.75).normalize();
     camera.position.copy(dir.multiplyScalar(distance));
 
     if (camera instanceof THREE.PerspectiveCamera) {
-      camera.fov = size.width < 480 ? 42 : 36;
-      camera.aspect = aspect;
+      camera.fov = isMobile ? 42 : 36;
       camera.updateProjectionMatrix();
     }
-  }, [size, camera]);
+
+    if (controlsRef.current) {
+      controlsRef.current.target.set(0, 0, 0);
+      controlsRef.current.update();
+    }
+  }, [isMobile, camera, controlsRef]);
 
   return (
     <OrbitControls
+      ref={controlsRef}
       makeDefault
       enableDamping
       dampingFactor={0.08}
       enablePan={false}
       enableRotate={!pointerDown}
-      enableZoom={!pointerDown}
+      enableZoom={pointerOver && !pointerDown}
       minDistance={7}
       maxDistance={16}
       minPolarAngle={Math.PI * 0.15}
@@ -263,10 +275,12 @@ function ResponsiveCamera({ pointerDown }: { pointerDown: boolean }) {
 function CubeScene({
   setPointerDown,
   pointerDown,
+  pointerOver,
   onControlsReady,
 }: {
   setPointerDown: Dispatch<SetStateAction<boolean>>;
   pointerDown: boolean;
+  pointerOver: boolean;
   onControlsReady: (controls: ControlsData) => void;
 }) {
   const [cubies, setCubies] = useState<CubieData[]>(createCubies);
@@ -274,6 +288,7 @@ function CubeScene({
   const [moves, setMoves] = useState(0);
 
   const rotationGroup = useRef<THREE.Group>(null);
+  const controlsRef = useRef<any>(null);
   const moveHistory = useRef<Move[]>([]);
   const { camera, size } = useThree();
 
@@ -285,8 +300,6 @@ function CubeScene({
     faceNormal: THREE.Vector3 | null;
     axis: Axis | null;
     layer: number | null;
-    // normalized screen-space direction that corresponds to a *positive* rotation
-    // around `axis`, computed once when the axis locks in
     tangentScreenDir: { x: number; y: number } | null;
   }>({
     active: false,
@@ -495,9 +508,6 @@ function CubeScene({
       const dx = e.clientX - drag.startX;
       const dy = e.clientY - drag.startY;
 
-      // Lock the rotation axis once the drag clears a small threshold, by
-      // testing which of the two candidate face-plane axes best matches the
-      // gesture direction on screen.
       if (!drag.axis && Math.hypot(dx, dy) > 6) {
         const normal = drag.faceNormal ?? new THREE.Vector3(0, 0, 1);
         const dominant: Axis = Math.abs(normal.x) > 0.5 ? "x" : Math.abs(normal.y) > 0.5 ? "y" : "z";
@@ -611,7 +621,7 @@ function CubeScene({
 
       <ContactShadows position={[0, -2, 0]} opacity={0.35} scale={10} blur={2.4} far={4} />
 
-      <ResponsiveCamera pointerDown={pointerDown} />
+      <ResponsiveCamera pointerDown={pointerDown} pointerOver={pointerOver} controlsRef={controlsRef} />
     </>
   );
 }
@@ -748,19 +758,6 @@ function CanvasContainer() {
   const [pointerOver, setPointerOver] = useState(false);
   const [pointerDown, setPointerDown] = useState(false);
   const [controls, setControls] = useState<ControlsData | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const wheelHandler = (event: WheelEvent) => {
-      if (pointerOver) event.preventDefault();
-    };
-
-    el.addEventListener("wheel", wheelHandler, { passive: false });
-    return () => el.removeEventListener("wheel", wheelHandler);
-  }, [pointerOver]);
 
   const handleControlsReady = useCallback((nextControls: ControlsData) => {
     setControls(nextControls);
@@ -768,10 +765,8 @@ function CanvasContainer() {
 
   return (
     <div
-      ref={containerRef}
       onPointerEnter={() => setPointerOver(true)}
       onPointerLeave={() => setPointerOver(false)}
-      onWheel={(event) => event.preventDefault()}
       style={{
         width: "100%",
         height: "100%",
@@ -783,8 +778,18 @@ function CanvasContainer() {
         userSelect: "none",
       }}
     >
-      <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} onPointerMissed={() => {}}>
-        <CubeScene setPointerDown={setPointerDown} pointerDown={pointerDown} onControlsReady={handleControlsReady} />
+      <Canvas
+        shadows
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true }}
+        onPointerMissed={() => {}}
+      >
+        <CubeScene
+          setPointerDown={setPointerDown}
+          pointerDown={pointerDown}
+          pointerOver={pointerOver}
+          onControlsReady={handleControlsReady}
+        />
       </Canvas>
 
       {controls && (
