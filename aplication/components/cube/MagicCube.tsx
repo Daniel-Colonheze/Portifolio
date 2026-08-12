@@ -453,6 +453,7 @@ function CubeScene({
         queue: animationRef.current.queue,
         isUndo,
         isShuffle,
+        isReset: animationRef.current.isReset, // NOVO — preserva a flag de reset entre chamadas em cadeia (queue)
       };
       currentRotation.current = 0;
       setRotating(true);
@@ -894,8 +895,6 @@ function CubeControls({
           width: "100%",
         }}
       >
-        {/* moves counter removed */}
-
         <button
           type="button"
           disabled={!canUndo}
