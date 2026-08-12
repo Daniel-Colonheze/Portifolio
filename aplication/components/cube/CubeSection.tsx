@@ -1,8 +1,11 @@
 "use client";
 
 import MagicCube from "../cube/MagicCube";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export function CubeSection() {
+  const { t } = useLanguage(); // NOVO
+
   return (
     <section
       id="cubo"
@@ -11,20 +14,18 @@ export function CubeSection() {
       <div className="mx-auto grid min-h-[80vh] max-w-7xl items-center gap-4 sm:gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
         <div className="relative z-10 flex flex-col items-start">
           <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-[#a78bfa]/70 sm:text-xs sm:tracking-[0.4em]">
-            Interativo 3D
+            {t.cube.label} {/* trocado */}
           </p>
 
           <h2 className="mt-3 max-w-xl font-serif text-4xl leading-[0.95] tracking-tight text-[#f5f5f7] sm:mt-4 sm:text-5xl md:text-7xl">
-            Cubo Mágico
+            {t.cube.titleLine1} {/* trocado */}
             <br />
-            <span className="text-[#a78bfa]">3D.</span>
+            <span className="text-[#a78bfa]">{t.cube.titleHighlight}</span>{" "}
+            {/* trocado */}
           </h2>
 
           <p className="mt-5 max-w-md text-sm leading-6 text-[#f5f5f7]/50 sm:mt-7 sm:text-base sm:leading-7 md:text-lg">
-            Gosto de criar experiências interativas usando tecnologias como
-            Three.js e Blender, transformando ideias em interfaces dinâmicas,
-            simples e interessantes de explorar. (Ctrl + Scroll para dar zoom no cubo.
-)
+            {t.cube.description} {/* trocado */}
           </p>
         </div>
 

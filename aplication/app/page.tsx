@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { LoadingScreen } from "@/components/loading/LoadingScreen";
 import { Hero } from "@/components/hero/Hero";
 import { TechStack } from "@/components/stack/TechStack";
-import { MobileNavigation } from "@/components/mobile/MobileNavigation";
 import { Certifications } from "@/components/certifications/Certifications";
 import { Projects } from "@/components/projects/Projects";
 import { Contact } from "@/components/contact/Contact";
@@ -42,7 +41,6 @@ export default function Home() {
         <Projects />
         <Certifications />
         <Contact />
-        <MobileNavigation />
       </main>
     </>
   );

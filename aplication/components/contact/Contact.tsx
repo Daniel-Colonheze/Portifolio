@@ -11,7 +11,7 @@ export function Contact() {
   const { start } = useLenisControls();
 
   const whatsappMessage = encodeURIComponent(
-    "Olá Daniel! Vi seu portfólio e gostaria de conversar."
+    "Olá Daniel! Vi seu portfólio e gostaria de conversar.",
   );
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, X, Download, ArrowLeft } from "lucide-react";
+import { Menu, X, Download } from "lucide-react"; 
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { LanguageSwitcher } from "../language/LanguageSwitcher";
@@ -17,8 +17,6 @@ export function Header() {
   const isMobile = useIsMobile();
 
   const [isOpen, setIsOpen] = useState(false);
-
-  const isNotHome = pathname !== "/";
 
   const links = [
     { label: t.header.about, href: "#sobre" },
@@ -59,41 +57,16 @@ export function Header() {
       className="fixed inset-x-0 top-0 z-20 px-4 pt-5 md:px-8 md:pt-6"
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between rounded-2xl border border-purple-500/10 bg-black/60 px-5 shadow-[0_0_30px_rgba(168,85,247,0.04)] backdrop-blur-xl md:px-7">
-        <div className="flex items-center gap-3">
-          <AnimatePresence>
-            {isNotHome && (
-              <motion.button
-                type="button"
-                onClick={() => router.push("/")}
-                initial={{ opacity: 0, x: -8, width: 0 }}
-                animate={{ opacity: 1, x: 0, width: "auto" }}
-                exit={{ opacity: 0, x: -8, width: 0 }}
-                transition={{ duration: 0.25 }}
-                whileHover={{ x: -2 }}
-                whileTap={{ scale: 0.92 }}
-                aria-label={t.header.back}
-                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-purple-500/20 bg-purple-500/[0.08] text-purple-400 transition-all duration-300 hover:border-purple-400/50 hover:bg-purple-500/[0.15] hover:text-purple-200 hover:shadow-[0_0_16px_rgba(168,85,247,0.25)]"
-              >
-                <ArrowLeft
-                  size={16}
-                  strokeWidth={2.25}
-                  className="transition-transform duration-300 group-hover:-translate-x-0.5"
-                />
-              </motion.button>
-            )}
-          </AnimatePresence>
-
-          <button
-            type="button"
-            onClick={handleLogo}
-            className="group font-mono text-sm font-semibold tracking-wider text-white"
-          >
-            Daniel Colonheze
-            <span className="text-purple-400 transition-colors group-hover:text-purple-300">
-              .
-            </span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleLogo}
+          className="group font-mono text-sm font-semibold tracking-wider text-white"
+        >
+          Daniel Colonheze
+          <span className="text-purple-400 transition-colors group-hover:text-purple-300">
+            .
+          </span>
+        </button>
 
         <nav className="hidden items-center gap-6 lg:flex">
           {links.map((link) => (
@@ -176,4 +149,3 @@ export function Header() {
     </motion.header>
   );
 }
-

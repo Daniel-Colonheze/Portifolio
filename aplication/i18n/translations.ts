@@ -19,6 +19,14 @@ export const translations = {
       viewBadge: "Ver badge",
     },
 
+    cube: {
+      label: "Interativo 3D",
+      titleLine1: "Cubo Mágico",
+      titleHighlight: "3D.",
+      description:
+        "Gosto de criar experiências interativas usando tecnologias como Three.js e Blender, transformando ideias em interfaces dinâmicas, simples e interessantes de explorar. (Ctrl + Scroll para dar zoom no cubo.)",
+    },
+
     header: {
       about: "Sobre",
       stack: "Stack",
@@ -95,6 +103,14 @@ export const translations = {
       description:
         "Third-semester Software Engineering student at the Federal University of Technology – Paraná, with practical experience in web development, focused on frontend development and API integration.\n\nI work with React, Next.js, Nest.js, and Node.js, building responsive interfaces and complete systems from scratch to production.\n\nI also have knowledge of cloud computing (AWS) and databases (PostgreSQL, MySQL), along with experience with agile methodologies and strong communication skills.\n\nCurrently, I am deepening my knowledge of fullstack development, studying NestJS, AWS, and software architecture.",
       explore: "↓ scroll to explore",
+    },
+
+    cube: {
+      label: "3D Interactive",
+      titleLine1: "Magic Cube",
+      titleHighlight: "3D.",
+      description:
+        "I enjoy creating interactive experiences using technologies like Three.js and Blender, turning ideas into dynamic interfaces that are simple and interesting to explore. (Ctrl + Scroll to zoom the cube.)",
     },
 
     header: {

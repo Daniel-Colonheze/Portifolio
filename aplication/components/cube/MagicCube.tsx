@@ -9,7 +9,12 @@ import {
   SetStateAction,
 } from "react";
 import * as THREE from "three";
-import { Environment, RoundedBox, ContactShadows, OrbitControls } from "@react-three/drei";
+import {
+  Environment,
+  RoundedBox,
+  ContactShadows,
+  OrbitControls,
+} from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
 type Axis = "x" | "y" | "z";
@@ -97,7 +102,9 @@ function faceToVector(face: Face): THREE.Vector3 {
 }
 
 function vectorToFace(vector: THREE.Vector3): Face {
-  const x = Math.round(vector.x), y = Math.round(vector.y), z = Math.round(vector.z);
+  const x = Math.round(vector.x),
+    y = Math.round(vector.y),
+    z = Math.round(vector.z);
   if (x === 1) return "x+";
   if (x === -1) return "x-";
   if (y === 1) return "y+";
@@ -105,7 +112,11 @@ function vectorToFace(vector: THREE.Vector3): Face {
   return z === 1 ? "z+" : "z-";
 }
 
-function rotatePosition(position: [number, number, number], axis: Axis, direction: 1 | -1): [number, number, number] {
+function rotatePosition(
+  position: [number, number, number],
+  axis: Axis,
+  direction: 1 | -1,
+): [number, number, number] {
   const [x, y, z] = position;
   if (axis === "x") return direction === 1 ? [x, -z, y] : [x, z, -y];
   if (axis === "y") return direction === 1 ? [z, y, -x] : [-z, y, x];
@@ -119,7 +130,11 @@ function rotateFace(face: Face, axis: Axis, direction: 1 | -1): Face {
   return vectorToFace(vector);
 }
 
-function rotateStickers(stickers: Partial<Record<Face, string>>, axis: Axis, direction: 1 | -1): Partial<Record<Face, string>> {
+function rotateStickers(
+  stickers: Partial<Record<Face, string>>,
+  axis: Axis,
+  direction: 1 | -1,
+): Partial<Record<Face, string>> {
   const rotated: Partial<Record<Face, string>> = {};
   Object.entries(stickers).forEach(([face, color]) => {
     if (!color) return;
@@ -128,9 +143,17 @@ function rotateStickers(stickers: Partial<Record<Face, string>>, axis: Axis, dir
   return rotated;
 }
 
-function setGroupRotation(group: THREE.Group | null, axis: Axis | null, value = 0) {
+function setGroupRotation(
+  group: THREE.Group | null,
+  axis: Axis | null,
+  value = 0,
+) {
   if (!group || !axis) return;
-  group.rotation.set(axis === "x" ? value : 0, axis === "y" ? value : 0, axis === "z" ? value : 0);
+  group.rotation.set(
+    axis === "x" ? value : 0,
+    axis === "y" ? value : 0,
+    axis === "z" ? value : 0,
+  );
 }
 
 function resetGroupRotation(group: THREE.Group | null) {
@@ -138,16 +161,17 @@ function resetGroupRotation(group: THREE.Group | null) {
   group.rotation.set(0, 0, 0);
 }
 
-// Projects a world-space direction vector, anchored at `origin`, into normalized
-// screen-space (x right, y down) so we can compare it against a mouse drag vector.
 function screenDirection(
   origin: THREE.Vector3,
   worldDir: THREE.Vector3,
   camera: THREE.Camera,
-  size: { width: number; height: number }
+  size: { width: number; height: number },
 ): { x: number; y: number } {
   const a = origin.clone().project(camera);
-  const b = origin.clone().add(worldDir.clone().multiplyScalar(0.15)).project(camera);
+  const b = origin
+    .clone()
+    .add(worldDir.clone().multiplyScalar(0.15))
+    .project(camera);
   const dx = ((b.x - a.x) * size.width) / 2;
   const dy = (-(b.y - a.y) * size.height) / 2;
   const len = Math.hypot(dx, dy) || 1;
@@ -157,7 +181,10 @@ function screenDirection(
 // ---------- visual pieces ----------
 
 function Sticker({ face, color }: { face: Face; color: string }) {
-  const CONFIG: Record<Face, { position: [number, number, number]; rotation: [number, number, number] }> = {
+  const CONFIG: Record<
+    Face,
+    { position: [number, number, number]; rotation: [number, number, number] }
+  > = {
     "x+": { position: [STICKER_OFFSET, 0, 0], rotation: [0, Math.PI / 2, 0] },
     "x-": { position: [-STICKER_OFFSET, 0, 0], rotation: [0, -Math.PI / 2, 0] },
     "y+": { position: [0, STICKER_OFFSET, 0], rotation: [-Math.PI / 2, 0, 0] },
@@ -285,7 +312,6 @@ function CubeScene({
 }) {
   const [cubies, setCubies] = useState<CubieData[]>(createCubies);
   const [rotating, setRotating] = useState(false);
-  // moves counter removed — we keep internal moveHistory for undo only
 
   const rotationGroup = useRef<THREE.Group>(null);
   const controlsRef = useRef<any>(null);
@@ -339,36 +365,47 @@ function CubeScene({
 
   const currentRotation = useRef(0);
 
-  const applyMoveToCube = useCallback((axis: Axis, layer: number, direction: 1 | -1) => {
-    setCubies((prev) =>
-      prev.map((cubie) => {
-        const index = axis === "x" ? 0 : axis === "y" ? 1 : 2;
-        if (cubie.position[index] !== layer) return cubie;
-        return {
-          ...cubie,
-          position: rotatePosition(cubie.position, axis, direction),
-          stickers: rotateStickers(cubie.stickers, axis, direction),
-        };
-      })
-    );
-  }, []);
+  const applyMoveToCube = useCallback(
+    (axis: Axis, layer: number, direction: 1 | -1) => {
+      setCubies((prev) =>
+        prev.map((cubie) => {
+          const index = axis === "x" ? 0 : axis === "y" ? 1 : 2;
+          if (cubie.position[index] !== layer) return cubie;
+          return {
+            ...cubie,
+            position: rotatePosition(cubie.position, axis, direction),
+            stickers: rotateStickers(cubie.stickers, axis, direction),
+          };
+        }),
+      );
+    },
+    [],
+  );
 
   const finishRotation = useCallback(
-    (axis: Axis, layer: number, direction: 1 | -1, countMove = true, isUndo = false) => {
+    (
+      axis: Axis,
+      layer: number,
+      direction: 1 | -1,
+      countMove = true,
+      isUndo = false,
+    ) => {
       applyMoveToCube(axis, layer, direction);
 
       if (countMove) {
         if (isUndo) {
-          // find and remove the last matching original move in fullHistory
-          // completed rotation used the inverse direction, so we search for the opposite
           const targetDir = -direction as 1 | -1;
           for (let i = fullHistory.current.length - 1; i >= 0; i--) {
             const entry = fullHistory.current[i];
-            if (entry.axis === axis && entry.layer === layer && entry.direction === targetDir) {
+            if (
+              entry.axis === axis &&
+              entry.layer === layer &&
+              entry.direction === targetDir
+            ) {
               const [removed] = fullHistory.current.splice(i, 1);
-                  if (removed.origin === "user") {
-                    moveHistory.current.pop();
-                  }
+              if (removed.origin === "user") {
+                moveHistory.current.pop();
+              }
               break;
             }
           }
@@ -387,9 +424,11 @@ function CubeScene({
       animationRef.current.axis = null;
       animationRef.current.layer = null;
 
-      // if this was part of a full reset sequence and this was the last move,
-      // clear the user's visible move counter and histories now
-      if (isUndo && animationRef.current.isReset && animationRef.current.queue.length === 0) {
+      if (
+        isUndo &&
+        animationRef.current.isReset &&
+        animationRef.current.queue.length === 0
+      ) {
         moveHistory.current = [];
         fullHistory.current = [];
         animationRef.current.isReset = false;
@@ -399,40 +438,50 @@ function CubeScene({
       animationRef.current.isShuffle = false;
       setRotating(false);
     },
-    [applyMoveToCube]
+    [applyMoveToCube],
   );
 
-  const startAnimation = useCallback((move: Move, duration: number, isUndo = false, isShuffle = false) => {
-    animationRef.current = {
-      active: true,
-      axis: move.axis,
-      layer: move.layer,
-      direction: move.direction,
-      elapsed: 0,
-      duration,
-      queue: animationRef.current.queue,
-      isUndo,
-      isShuffle,
-    };
-    currentRotation.current = 0;
-    setRotating(true);
-  }, []);
+  const startAnimation = useCallback(
+    (move: Move, duration: number, isUndo = false, isShuffle = false) => {
+      animationRef.current = {
+        active: true,
+        axis: move.axis,
+        layer: move.layer,
+        direction: move.direction,
+        elapsed: 0,
+        duration,
+        queue: animationRef.current.queue,
+        isUndo,
+        isShuffle,
+      };
+      currentRotation.current = 0;
+      setRotating(true);
+    },
+    [],
+  );
 
   const performMove = useCallback(
     (axis: Axis, layer: number, direction: 1 | -1) => {
       if (rotating || animationRef.current.active) return;
       startAnimation({ axis, layer, direction }, 260, false);
     },
-    [rotating, startAnimation]
+    [rotating, startAnimation],
   );
 
   const undoMove = useCallback(() => {
     if (rotating || animationRef.current.active) return;
     const lastMove = moveHistory.current[moveHistory.current.length - 1];
     if (!lastMove) return;
-    // mark this as an undo operation; startAnimation will handle popping from fullHistory
     animationRef.current.isShuffle = false;
-    startAnimation({ axis: lastMove.axis, layer: lastMove.layer, direction: (lastMove.direction * -1) as 1 | -1 }, 260, true);
+    startAnimation(
+      {
+        axis: lastMove.axis,
+        layer: lastMove.layer,
+        direction: (lastMove.direction * -1) as 1 | -1,
+      },
+      260,
+      true,
+    );
   }, [rotating, startAnimation]);
 
   const resetCube = useCallback(() => {
@@ -443,12 +492,15 @@ function CubeScene({
     const inverse = history
       .slice()
       .reverse()
-      .map((m) => ({ axis: m.axis, layer: m.layer, direction: (m.direction * -1) as 1 | -1 }));
+      .map((m) => ({
+        axis: m.axis,
+        layer: m.layer,
+        direction: (m.direction * -1) as 1 | -1,
+      }));
 
     const first = inverse.shift();
     if (!first) return;
 
-    // mark reset in progress; clear counter only after undo animation completes
     animationRef.current.isReset = true;
     animationRef.current.isShuffle = false;
     animationRef.current.queue = inverse as Move[];
@@ -464,7 +516,8 @@ function CubeScene({
 
     for (let i = 0; i < 20; i++) {
       let axis = axes[Math.floor(Math.random() * axes.length)];
-      while (axis === previousAxis) axis = axes[Math.floor(Math.random() * axes.length)];
+      while (axis === previousAxis)
+        axis = axes[Math.floor(Math.random() * axes.length)];
       previousAxis = axis;
 
       queue.push({
@@ -477,8 +530,6 @@ function CubeScene({
     const firstMove = queue.shift();
     if (!firstMove) return;
 
-    // mark upcoming animations as shuffle so they are stored in fullHistory but
-    // won't increment the user-visible move counter
     animationRef.current.isShuffle = true;
     animationRef.current.queue = queue;
     startAnimation(firstMove, 170, false, true);
@@ -497,9 +548,18 @@ function CubeScene({
   useFrame((_, delta) => {
     const animation = animationRef.current;
 
-    if (animation.active && animation.axis && animation.layer !== null && rotationGroup.current) {
+    if (
+      animation.active &&
+      animation.axis &&
+      animation.layer !== null &&
+      rotationGroup.current
+    ) {
       animation.elapsed += delta;
-      const progress = THREE.MathUtils.clamp(animation.elapsed / (animation.duration / 1000), 0, 1);
+      const progress = THREE.MathUtils.clamp(
+        animation.elapsed / (animation.duration / 1000),
+        0,
+        1,
+      );
       const eased = 1 - Math.pow(1 - progress, 3);
       const rotation = animation.direction * (Math.PI / 2) * eased;
 
@@ -507,23 +567,45 @@ function CubeScene({
       setGroupRotation(rotationGroup.current, animation.axis, rotation);
 
       if (progress >= 1) {
-        const completedMove: Move = { axis: animation.axis, layer: animation.layer, direction: animation.direction };
+        const completedMove: Move = {
+          axis: animation.axis,
+          layer: animation.layer,
+          direction: animation.direction,
+        };
         const nextMove = animation.queue.shift();
         const wasUndo = animation.isUndo;
 
-        finishRotation(completedMove.axis, completedMove.layer, completedMove.direction, true, wasUndo);
+        finishRotation(
+          completedMove.axis,
+          completedMove.layer,
+          completedMove.direction,
+          true,
+          wasUndo,
+        );
 
         if (nextMove) {
           const isShuffleNext = animation.isShuffle || false;
           const isUndoNext = (animation.isUndo || animation.isReset) as boolean;
-          setTimeout(() => startAnimation(nextMove, 170, isUndoNext, isShuffleNext), 25);
+          setTimeout(
+            () => startAnimation(nextMove, 170, isUndoNext, isShuffleNext),
+            25,
+          );
         }
       }
       return;
     }
 
-    if (dragRef.current.active && dragRef.current.axis && dragRef.current.layer !== null && rotationGroup.current) {
-      setGroupRotation(rotationGroup.current, dragRef.current.axis, currentRotation.current);
+    if (
+      dragRef.current.active &&
+      dragRef.current.axis &&
+      dragRef.current.layer !== null &&
+      rotationGroup.current
+    ) {
+      setGroupRotation(
+        rotationGroup.current,
+        dragRef.current.axis,
+        currentRotation.current,
+      );
     }
   });
 
@@ -536,7 +618,9 @@ function CubeScene({
     try {
       const local = event.face?.normal?.clone?.();
       if (local && event.object) {
-        faceNormal = local.transformDirection(event.object.matrixWorld).normalize();
+        faceNormal = local
+          .transformDirection(event.object.matrixWorld)
+          .normalize();
       }
     } catch {
       faceNormal = null;
@@ -553,19 +637,32 @@ function CubeScene({
       tangentScreenDir: null,
     };
 
-    const cubieOrigin = new THREE.Vector3(cubie.position[0] * STEP, cubie.position[1] * STEP, cubie.position[2] * STEP);
+    const cubieOrigin = new THREE.Vector3(
+      cubie.position[0] * STEP,
+      cubie.position[1] * STEP,
+      cubie.position[2] * STEP,
+    );
 
     const onMove = (e: PointerEvent) => {
       const drag = dragRef.current;
-      if (!drag.active || !drag.cubie || rotating || animationRef.current.active) return;
+      if (
+        !drag.active ||
+        !drag.cubie ||
+        rotating ||
+        animationRef.current.active
+      )
+        return;
 
       const dx = e.clientX - drag.startX;
       const dy = e.clientY - drag.startY;
 
       if (!drag.axis && Math.hypot(dx, dy) > 6) {
         const normal = drag.faceNormal ?? new THREE.Vector3(0, 0, 1);
-        const dominant: Axis = Math.abs(normal.x) > 0.5 ? "x" : Math.abs(normal.y) > 0.5 ? "y" : "z";
-        const candidates: Axis[] = (["x", "y", "z"] as Axis[]).filter((a) => a !== dominant);
+        const dominant: Axis =
+          Math.abs(normal.x) > 0.5 ? "x" : Math.abs(normal.y) > 0.5 ? "y" : "z";
+        const candidates: Axis[] = (["x", "y", "z"] as Axis[]).filter(
+          (a) => a !== dominant,
+        );
 
         let bestAxis: Axis = candidates[0];
         let bestDir: { x: number; y: number } = { x: 1, y: 0 };
@@ -592,9 +689,14 @@ function CubeScene({
 
       if (!drag.axis || drag.layer === null || !drag.tangentScreenDir) return;
 
-      const projection = drag.tangentScreenDir.x * dx + drag.tangentScreenDir.y * dy;
+      const projection =
+        drag.tangentScreenDir.x * dx + drag.tangentScreenDir.y * dy;
       const sensitivity = 0.012;
-      currentRotation.current = THREE.MathUtils.clamp(projection * sensitivity, -Math.PI / 2, Math.PI / 2);
+      currentRotation.current = THREE.MathUtils.clamp(
+        projection * sensitivity,
+        -Math.PI / 2,
+        Math.PI / 2,
+      );
     };
 
     const onUp = () => {
@@ -632,8 +734,12 @@ function CubeScene({
     setPointerDown(false);
   };
 
-  const activeAxis = animationRef.current.active ? animationRef.current.axis : dragRef.current.axis;
-  const activeLayer = animationRef.current.active ? animationRef.current.layer : dragRef.current.layer;
+  const activeAxis = animationRef.current.active
+    ? animationRef.current.axis
+    : dragRef.current.axis;
+  const activeLayer = animationRef.current.active
+    ? animationRef.current.layer
+    : dragRef.current.layer;
 
   const selectedIds = new Set<number>();
   if (activeAxis && activeLayer !== null) {
@@ -652,7 +758,9 @@ function CubeScene({
       : [];
 
   const remainingCubies =
-    activeAxis && activeLayer !== null ? cubies.filter((cubie) => !layerCubies.includes(cubie)) : cubies;
+    activeAxis && activeLayer !== null
+      ? cubies.filter((cubie) => !layerCubies.includes(cubie))
+      : cubies;
 
   return (
     <>
@@ -663,26 +771,52 @@ function CubeScene({
 
       <group>
         {remainingCubies.map((cubie) => (
-          <Cubie key={cubie.id} cubie={cubie} selected={selectedIds.has(cubie.id)} onPointerDown={handlePointerDown} />
+          <Cubie
+            key={cubie.id}
+            cubie={cubie}
+            selected={selectedIds.has(cubie.id)}
+            onPointerDown={handlePointerDown}
+          />
         ))}
 
         <group ref={rotationGroup}>
           {layerCubies.map((cubie) => (
-            <Cubie key={cubie.id} cubie={cubie} selected onPointerDown={handlePointerDown} />
+            <Cubie
+              key={cubie.id}
+              cubie={cubie}
+              selected
+              onPointerDown={handlePointerDown}
+            />
           ))}
         </group>
       </group>
 
-      <ContactShadows position={[0, -2, 0]} opacity={0.35} scale={10} blur={2.4} far={4} />
+      <ContactShadows
+        position={[0, -2, 0]}
+        opacity={0.35}
+        scale={10}
+        blur={2.4}
+        far={4}
+      />
 
-      <ResponsiveCamera pointerDown={pointerDown} pointerOver={pointerOver} controlsRef={controlsRef} />
+      <ResponsiveCamera
+        pointerDown={pointerDown}
+        pointerOver={pointerOver}
+        controlsRef={controlsRef}
+      />
     </>
   );
 }
 
 // ---------- controls UI ----------
 
-function CubeControls({ canUndo, onMove, onShuffle, onUndo, onReset }: ControlsData) {
+function CubeControls({
+  canUndo,
+  onMove,
+  onShuffle,
+  onUndo,
+  onReset,
+}: ControlsData) {
   const buttonStyle: React.CSSProperties = {
     minWidth: "clamp(40px, 11vw, 48px)",
     height: "clamp(38px, 10vw, 42px)",
@@ -694,7 +828,8 @@ function CubeControls({ canUndo, onMove, onShuffle, onUndo, onReset }: ControlsD
     fontSize: "clamp(11px, 3vw, 13px)",
     fontFamily: "var(--font-geist-mono)",
     cursor: "pointer",
-    transition: "background 0.2s ease, border-color 0.2s ease, transform 0.15s ease",
+    transition:
+      "background 0.2s ease, border-color 0.2s ease, transform 0.15s ease",
     touchAction: "manipulation",
     WebkitTapHighlightColor: "transparent",
   };
@@ -767,8 +902,12 @@ function CubeControls({ canUndo, onMove, onShuffle, onUndo, onReset }: ControlsD
           style={{
             ...buttonStyle,
             minWidth: "clamp(60px, 18vw, 80px)",
-            borderColor: canUndo ? "rgba(167, 139, 250, 0.4)" : "rgba(139, 92, 246, 0.12)",
-            background: canUndo ? "rgba(167, 139, 250, 0.14)" : "rgba(139, 92, 246, 0.04)",
+            borderColor: canUndo
+              ? "rgba(167, 139, 250, 0.4)"
+              : "rgba(139, 92, 246, 0.12)",
+            background: canUndo
+              ? "rgba(167, 139, 250, 0.14)"
+              : "rgba(139, 92, 246, 0.04)",
             opacity: canUndo ? 1 : 0.4,
             cursor: canUndo ? "pointer" : "default",
           }}
