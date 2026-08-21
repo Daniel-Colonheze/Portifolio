@@ -17,7 +17,7 @@ const certifications = [
         title: "Certificado AWS",
         institution: "AWS",
         year: "2026",
-        image: "/images/certifications/certificado-1.png",
+        image: "/images/certifications/Certificado-1.png",
         link: "/images/certifications/Certificado-1.png",
   },
 ];
