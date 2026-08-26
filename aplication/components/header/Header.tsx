@@ -84,7 +84,7 @@ export function Header() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <a
-            href="/resume/Daniel-colonheze-currículo.pdf"
+            href="/resume/Daniel-colonheze-curriculo.pdf"
             download
             className="flex items-center gap-2 rounded-full border border-purple-400/25 bg-purple-500/[0.06] px-4 py-2 font-mono text-[10px] uppercase tracking-[0.14em] text-purple-300 transition-colors hover:border-purple-400/50 hover:bg-purple-500/10"
           >
