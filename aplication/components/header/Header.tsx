@@ -134,7 +134,7 @@ export function Header() {
               ))}
 
               <a
-                href="/resume/Daniel-colonheze-currículo.pdf"
+                href="/resume/Daniel-Colonheze-currículo.pdf"
                 download
                 onClick={() => setIsOpen(false)}
                 className="mt-2 flex items-center justify-between rounded-xl border border-purple-500/15 bg-purple-500/[0.04] px-4 py-4 text-left font-mono text-xs uppercase tracking-[0.18em] text-purple-300 transition-colors hover:bg-purple-500/[0.08]"
